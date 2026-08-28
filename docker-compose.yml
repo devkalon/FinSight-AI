@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Managed PostgreSQL with pgvector for Relational Data & Semantic Embeddings
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: finsight_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finsight_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finsight_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-finsight_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finsight_user} -d ${POSTGRES_DB:-finsight_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finsight_network
+
+  # FastAPI Backend API Gateway
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: finsight_backend
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-finsight_user}:${POSTGRES_PASSWORD:-finsight_secure_pass_2026}@db:5432/${POSTGRES_DB:-finsight_db}
+      SECRET_KEY: ${SECRET_KEY:-super-secret-finsight-ai-jwt-key-2026-secure-token-vault}
+      BACKEND_CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - finsight_network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: finsight_frontend
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - finsight_network
+
+volumes:
+  postgres_data:
+
+networks:
+  finsight_network:
+    driver: bridge

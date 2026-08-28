@@ -1,0 +1,432 @@
+[
+  {
+    "description": "UPI-SWIGGY-swiggy@icici-902183129012",
+    "category": "Food",
+    "subcategory": "Food Delivery"
+  },
+  {
+    "description": "ZOMATO RESTAURANT ORDER GURGAON",
+    "category": "Food",
+    "subcategory": "Food Delivery"
+  },
+  {
+    "description": "STARBUCKS COFFEE CONNAUGHT PLACE",
+    "category": "Food",
+    "subcategory": "Cafe & Bakery"
+  },
+  {
+    "description": "DOMINOS PIZZA ONLINE DELIVERY",
+    "category": "Food",
+    "subcategory": "Restaurants"
+  },
+  {
+    "description": "BLINKIT QUICK GROCERY BANGALORE",
+    "category": "Food",
+    "subcategory": "Groceries"
+  },
+  {
+    "description": "ZEPTO 10MIN GROCERY DELIVERY",
+    "category": "Food",
+    "subcategory": "Groceries"
+  },
+  {
+    "description": "BIGBASKET DAILY MILK AND VEGGIES",
+    "category": "Food",
+    "subcategory": "Groceries"
+  },
+  {
+    "description": "MCDONALDS DRIVE THRU MUMBAI",
+    "category": "Food",
+    "subcategory": "Restaurants"
+  },
+  {
+    "description": "CHAAYOS HOT CHAI AND SNACKS",
+    "category": "Food",
+    "subcategory": "Cafe & Bakery"
+  },
+  {
+    "description": "EATCLUB LUNCH BOX ORDER",
+    "category": "Food",
+    "subcategory": "Food Delivery"
+  },
+  {
+    "description": "UBER INDIA SYSTEMS PVT LTD RIDE",
+    "category": "Transport",
+    "subcategory": "Cabs & Rides"
+  },
+  {
+    "description": "OLA CABS BANGALORE AIRPORT TRIP",
+    "category": "Transport",
+    "subcategory": "Cabs & Rides"
+  },
+  {
+    "description": "RAPIDO BIKE TAXI RIDE BLR",
+    "category": "Transport",
+    "subcategory": "Cabs & Rides"
+  },
+  {
+    "description": "SHELL PETROL PUMP FUEL KORAMANGALA",
+    "category": "Transport",
+    "subcategory": "Fuel"
+  },
+  {
+    "description": "HPCL AUTO FUEL FILLING STATION",
+    "category": "Transport",
+    "subcategory": "Fuel"
+  },
+  {
+    "description": "BPCL PETROL BUNK PUNE",
+    "category": "Transport",
+    "subcategory": "Fuel"
+  },
+  {
+    "description": "NHAI FASTAG TOLL RECHARGE ICICI",
+    "category": "Transport",
+    "subcategory": "Tolls & Parking"
+  },
+  {
+    "description": "BANGALORE METRO SMART CARD RECHARGE",
+    "category": "Transport",
+    "subcategory": "Public Transit"
+  },
+  {
+    "description": "MUMBAI LOCAL RAIL PASS UTS",
+    "category": "Transport",
+    "subcategory": "Public Transit"
+  },
+  {
+    "description": "BANGALORE METRO AUTOMATED GATE RECHARGE",
+    "category": "Transport",
+    "subcategory": "Public Transit"
+  },
+  {
+    "description": "AMAZON SELLER SERVICES RETAIL",
+    "category": "Shopping",
+    "subcategory": "Online Retail"
+  },
+  {
+    "description": "FLIPKART INTERNET PVT LTD PURCHASE",
+    "category": "Shopping",
+    "subcategory": "Online Retail"
+  },
+  {
+    "description": "MYNTRA FASHION CLOTHING SALE",
+    "category": "Shopping",
+    "subcategory": "Clothing & Fashion"
+  },
+  {
+    "description": "ZARA INDIA RETAIL APPARELS",
+    "category": "Shopping",
+    "subcategory": "Clothing & Fashion"
+  },
+  {
+    "description": "H&M PHOENIX MALL BANGALORE",
+    "category": "Shopping",
+    "subcategory": "Clothing & Fashion"
+  },
+  {
+    "description": "CROMA ELECTRONICS LAPTOP ACCESSORY",
+    "category": "Shopping",
+    "subcategory": "Electronics"
+  },
+  {
+    "description": "RELIANCE DIGITAL SMARTPHONE PURCHASE",
+    "category": "Shopping",
+    "subcategory": "Electronics"
+  },
+  {
+    "description": "NYKAA BEAUTY AND COSMETICS",
+    "category": "Shopping",
+    "subcategory": "Online Retail"
+  },
+  {
+    "description": "AJIO TRENDS APPAREL STORE",
+    "category": "Shopping",
+    "subcategory": "Clothing & Fashion"
+  },
+  {
+    "description": "IKEA FURNITURE HOME DECOR",
+    "category": "Shopping",
+    "subcategory": "Home & Kitchen"
+  },
+  {
+    "description": "BESCOM ELECTRICITY BILL BANGALORE",
+    "category": "Bills",
+    "subcategory": "Electricity"
+  },
+  {
+    "description": "TATA POWER DELHI DISTRIBUTION BILL",
+    "category": "Bills",
+    "subcategory": "Electricity"
+  },
+  {
+    "description": "AIRTEL FIBER BROADBAND BILL",
+    "category": "Bills",
+    "subcategory": "Mobile & Broadband"
+  },
+  {
+    "description": "JIO PREPAID 5G RECHARGE 3 MONTHS",
+    "category": "Bills",
+    "subcategory": "Mobile & Broadband"
+  },
+  {
+    "description": "INDANE LPG GAS CYLINDER REFILL",
+    "category": "Bills",
+    "subcategory": "Water & Gas"
+  },
+  {
+    "description": "MAHANAGAR GAS PNG PIPELINE BILL",
+    "category": "Bills",
+    "subcategory": "Water & Gas"
+  },
+  {
+    "description": "TATA PLAY DTH MONTHLY PACK",
+    "category": "Bills",
+    "subcategory": "DTH"
+  },
+  {
+    "description": "BWSSB WATER SUPPLY BILL PAYMENT",
+    "category": "Bills",
+    "subcategory": "Water & Gas"
+  },
+  {
+    "description": "NETFLIX ENTERTAINMENT SUBSCRIPTION",
+    "category": "Subscriptions",
+    "subcategory": "Media Streaming"
+  },
+  {
+    "description": "SPOTIFY PREMIUM INDIVIDUAL PLAN",
+    "category": "Subscriptions",
+    "subcategory": "Media Streaming"
+  },
+  {
+    "description": "DISNEY HOTSTAR ANNUAL VIP PLAN",
+    "category": "Subscriptions",
+    "subcategory": "Media Streaming"
+  },
+  {
+    "description": "YOUTUBE PREMIUM FAMILY MEMBERSHIP",
+    "category": "Subscriptions",
+    "subcategory": "Media Streaming"
+  },
+  {
+    "description": "GITHUB COPILOT MONTHLY SAAS",
+    "category": "Subscriptions",
+    "subcategory": "SaaS & Cloud"
+  },
+  {
+    "description": "OPENAI CHATGPT PLUS SUBSCRIPTION",
+    "category": "Subscriptions",
+    "subcategory": "SaaS & Cloud"
+  },
+  {
+    "description": "AWS EMEA CLOUD HOSTING BILL",
+    "category": "Subscriptions",
+    "subcategory": "SaaS & Cloud"
+  },
+  {
+    "description": "ADOBE CREATIVE CLOUD MONTHLY",
+    "category": "Subscriptions",
+    "subcategory": "SaaS & Cloud"
+  },
+  {
+    "description": "BOOKMYSHOW MOVIE TICKETS PVR INOX",
+    "category": "Entertainment",
+    "subcategory": "Movies & Events"
+  },
+  {
+    "description": "PVR CINEMAS GOLD CLASS TICKETS",
+    "category": "Entertainment",
+    "subcategory": "Movies & Events"
+  },
+  {
+    "description": "STEAM GAMES VALVE SOFTWARE PURCHASE",
+    "category": "Entertainment",
+    "subcategory": "Gaming"
+  },
+  {
+    "description": "PLAYSTATION NETWORK PS PLUS GAME",
+    "category": "Entertainment",
+    "subcategory": "Gaming"
+  },
+  {
+    "description": "SMAAASH ENTERTAINMENT BOWLING ARENA",
+    "category": "Entertainment",
+    "subcategory": "Movies & Events"
+  },
+  {
+    "description": "UDEMY ONLINE COURSE PYTHON MASTERCLASS",
+    "category": "Education",
+    "subcategory": "Courses & Books"
+  },
+  {
+    "description": "COURSERA ANNUAL LEARNING SUBSCRIPTION",
+    "category": "Education",
+    "subcategory": "Courses & Books"
+  },
+  {
+    "description": "DPS INTERNATIONAL SCHOOL QUARTERLY TUITION",
+    "category": "Education",
+    "subcategory": "Tuition & School Fees"
+  },
+  {
+    "description": "ALLEN CAREER INSTITUTE COACHING FEES",
+    "category": "Education",
+    "subcategory": "Tuition & School Fees"
+  },
+  {
+    "description": "OXFORD UNIVERSITY PRESS TEXTBOOKS",
+    "category": "Education",
+    "subcategory": "Courses & Books"
+  },
+  {
+    "description": "APOLLO PHARMACY PRESCRIPTION MEDICINES",
+    "category": "Healthcare",
+    "subcategory": "Pharmacy & Medicine"
+  },
+  {
+    "description": "TATA 1MG HEALTH LAB BLOOD TEST",
+    "category": "Healthcare",
+    "subcategory": "Doctor & Hospital"
+  },
+  {
+    "description": "PHARMEASY ORDER MEDICINES ONLINE",
+    "category": "Healthcare",
+    "subcategory": "Pharmacy & Medicine"
+  },
+  {
+    "description": "FORTIS HOSPITAL CONSULTATION FEES",
+    "category": "Healthcare",
+    "subcategory": "Doctor & Hospital"
+  },
+  {
+    "description": "CULT FIT ANNUAL GYM MEMBERSHIP",
+    "category": "Healthcare",
+    "subcategory": "Fitness & Gym"
+  },
+  {
+    "description": "HOUSE RENT TRANSFER TO LANDLORD",
+    "category": "Rent",
+    "subcategory": "House Rent"
+  },
+  {
+    "description": "PRESTIGE APARTMENTS MONTHLY SOCIETY MAINTENANCE",
+    "category": "Rent",
+    "subcategory": "Maintenance & Society Dues"
+  },
+  {
+    "description": "NOBROKER PAY FLAT RENT BANGALORE",
+    "category": "Rent",
+    "subcategory": "House Rent"
+  },
+  {
+    "description": "BRIGADE RESIDENCY MAINTENANCE CHARGES",
+    "category": "Rent",
+    "subcategory": "Maintenance & Society Dues"
+  },
+  {
+    "description": "HDFC BANK HOME LOAN EMI DEDUCTION",
+    "category": "EMI",
+    "subcategory": "Home Loan"
+  },
+  {
+    "description": "SBI CAR LOAN MONTHLY AUTO DEBIT",
+    "category": "EMI",
+    "subcategory": "Car Loan"
+  },
+  {
+    "description": "ICICI PERSONAL LOAN EMI PAYMENT",
+    "category": "EMI",
+    "subcategory": "Personal Loan"
+  },
+  {
+    "description": "AXIS BANK CREDIT CARD EMI CONVERSION",
+    "category": "EMI",
+    "subcategory": "Credit Card EMI"
+  },
+  {
+    "description": "HDFC ERGO HEALTH INSURANCE ANNUAL PREMIUM",
+    "category": "Insurance",
+    "subcategory": "Health Insurance"
+  },
+  {
+    "description": "MAX LIFE INSURANCE TERM POLICY",
+    "category": "Insurance",
+    "subcategory": "Life Insurance"
+  },
+  {
+    "description": "ACKO CAR MOTOR INSURANCE RENEWAL",
+    "category": "Insurance",
+    "subcategory": "Vehicle Insurance"
+  },
+  {
+    "description": "STAR HEALTH AND ALLIED INSURANCE",
+    "category": "Insurance",
+    "subcategory": "Health Insurance"
+  },
+  {
+    "description": "ZERODHA BROKING EQUITY INVESTMENT",
+    "category": "Investment",
+    "subcategory": "Stocks & Equity"
+  },
+  {
+    "description": "GROWW NIFTY 50 INDEX FUND SIP",
+    "category": "Investment",
+    "subcategory": "Mutual Funds & SIP"
+  },
+  {
+    "description": "HDFC MUTUAL FUND SYSTEMATIC INVESTMENT",
+    "category": "Investment",
+    "subcategory": "Mutual Funds & SIP"
+  },
+  {
+    "description": "SOVEREIGN GOLD BOND RESERVE BANK RBI",
+    "category": "Investment",
+    "subcategory": "Gold"
+  },
+  {
+    "description": "SBI FIXED DEPOSIT AUTO CREATION",
+    "category": "Investment",
+    "subcategory": "Fixed Deposits"
+  },
+  {
+    "description": "INDIGO AIRLINES FLIGHT BOOKING BLR DEL",
+    "category": "Travel",
+    "subcategory": "Flights & Airlines"
+  },
+  {
+    "description": "IRCTC TRAIN TICKET WEB BOOKING",
+    "category": "Travel",
+    "subcategory": "Trains & Buses"
+  },
+  {
+    "description": "MAKEMYTRIP GOA RESORT STAY BOOKING",
+    "category": "Travel",
+    "subcategory": "Hotels & Stays"
+  },
+  {
+    "description": "AIR INDIA INTERNATIONAL TICKET",
+    "category": "Travel",
+    "subcategory": "Flights & Airlines"
+  },
+  {
+    "description": "REDBUS INTERCITY SLEEPER COACH TICKET",
+    "category": "Travel",
+    "subcategory": "Trains & Buses"
+  },
+  {
+    "description": "ATM CASH WITHDRAWAL HDFC KORAMANGALA",
+    "category": "Other",
+    "subcategory": "Cash Withdrawal"
+  },
+  {
+    "description": "IMPS FUND TRANSFER TO FRIEND",
+    "category": "Other",
+    "subcategory": "Transfers"
+  },
+  {
+    "description": "MISCELLANEOUS BANK CHARGES GST",
+    "category": "Other",
+    "subcategory": "Miscellaneous"
+  }
+]

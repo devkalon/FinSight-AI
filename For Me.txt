@@ -1,0 +1,137 @@
+Perform a performance optimization pass.
+
+Test with synthetic datasets containing:
+
+10,000 transactions
+50,000 transactions
+100,000 transactions
+
+Measure:
+
+- transaction query latency
+- dashboard load time
+- analytics calculation time
+- CSV import time
+- OCR processing time
+- RAG retrieval latency
+- AI response latency
+
+Identify bottlenecks.
+
+Optimize:
+- database indexes
+- queries
+- pagination
+- aggregation
+- caching
+- background jobs
+- batch processing
+
+Do not prematurely optimize.
+
+Produce a benchmark report before and after optimization.
+
+
+
+
+
+
+
+
+
+Detailed Vulnerability Analysis
+1. CRITICAL SEVERITY
+[SEC-01] Hardcoded Default Secret Key Fallback for JWT Signing
+Vulnerability: In 
+
+backend/app/core/config.py
+, SECRET_KEY defaults to "super-secret-finsight-ai-jwt-key-2026-secure-token-vault" if not set in .env.
+Affected Files: 
+
+backend/app/core/config.py
+Impact: In staging or production, an attacker knowing the fallback secret key can forge arbitrary JWT tokens, impersonating any user or administrator to access confidential financial data.
+Recommended Fix: Disallow fallback in production mode; raise an explicit configuration error on startup if SECRET_KEY is missing or matches the default key.
+[SEC-02] Permissive Wildcard CORS Configuration with Credentials
+Vulnerability: In 
+
+backend/app/core/config.py
+ and 
+
+backend/app/main.py
+, BACKEND_CORS_ORIGINS includes "*" alongside allow_credentials=True.
+Affected Files: 
+
+backend/app/core/config.py
+, 
+
+backend/app/main.py
+Impact: Wildcard origin configuration with credential sharing can allow arbitrary untrusted third-party web domains to execute authenticated cross-origin requests on behalf of logged-in users.
+Recommended Fix: Remove "*" from BACKEND_CORS_ORIGINS. Explicitly whitelist only approved frontend origins (http://localhost:3000, http://127.0.0.1:3000, and authorized production domains).
+2. HIGH SEVERITY
+[SEC-03] Missing Rate Limiting on Auth, Ingestion & AI Endpoints
+Vulnerability: Sensitive API endpoints lack rate limiting.
+Affected Files: 
+
+backend/app/api/v1/endpoints/auth.py
+, 
+
+backend/app/api/v1/endpoints/documents.py
+, 
+
+backend/app/api/v1/endpoints/advisor.py
+Impact: Endpoints are susceptible to credential stuffing / brute-force attacks on login, as well as denial of service / compute resource exhaustion through continuous OCR / ML execution.
+Recommended Fix: Integrate slowapi with in-memory or Redis-backed rate limits (e.g. 5 attempts/min for login, 15 requests/min for document uploads).
+[SEC-04] In-Memory Token Revocation Store in Multi-Worker Environments
+Vulnerability: 
+
+backend/app/core/security.py
+ stores revoked tokens in a local in-memory Python set (_REVOKED_TOKENS).
+Affected Files: 
+
+backend/app/core/security.py
+Impact: In multi-process ASGI deployments (uvicorn --workers 4), a token revoked on Worker 1 remains valid on Workers 2, 3, and 4 until natural token expiration.
+Recommended Fix: Store revoked tokens in a shared Redis cache or lightweight database table with TTL.
+3. MEDIUM SEVERITY
+[SEC-05] Unlinked File Residuals on GDPR User Account Deletion
+Vulnerability: In 
+
+backend/app/services/auth_service.py
+, user database rows are deleted, but physical binary files saved in uploads/receipts/ and uploads/statements/ remain on disk.
+Affected Files: 
+
+backend/app/services/auth_service.py
+, 
+
+backend/app/services/ingestion/document_service.py
+Impact: Residual financial statement PDFs and receipt images containing customer transactions remain stored in server disk storage.
+Recommended Fix: Unlink all physical file paths referenced by the user's FinancialDocument records before executing database deletion.
+[SEC-06] File Validation Relies Solely on Extension Rather than Magic Bytes
+Vulnerability: In 
+
+backend/app/services/ingestion/document_service.py
+, file validation checks filename extensions (.jpg, .png, .pdf, .csv) without inspecting magic byte headers.
+Affected Files: 
+
+backend/app/services/ingestion/document_service.py
+Impact: Potential upload of polyglot or non-image payloads disguised with image extensions.
+Recommended Fix: Inspect file byte signatures (b'%PDF' for PDFs, b'\x89PNG' for PNGs, b'\xff\xd8\xff' for JPEGs) in addition to extension filtering.
+4. LOW SEVERITY
+[SEC-07] Verbose Error Details in Unhandled Exceptions
+Vulnerability: Unhandled 500 errors could expose internal stack traces or library version numbers.
+Affected Files: 
+
+backend/app/main.py
+Impact: Low-level information disclosure.
+Recommended Fix: Add a global exception handler that logs full tracebacks to server logs while returning a sanitized JSON error response.
+[SEC-08] Missing Standard HTTP Security Headers (CSP, HSTS)
+Vulnerability: Response headers do not include X-Content-Type-Options: nosniff, X-Frame-Options: DENY, Referrer-Policy: strict-origin-when-cross-origin, or Content-Security-Policy.
+Affected Files: 
+
+backend/app/main.py
+Impact: Potential exposure to clickjacking or MIME-type sniffing in legacy clients.
+Recommended Fix: Add security header middleware to inject standard security headers on all API responses.
+Positive Security Controls Verified
+SQL Injection: 0 vulnerabilities found. Parameterized SQLAlchemy ORM queries are strictly enforced across all 9 API endpoint routers.
+Tenant Isolation & IDOR: 0 vulnerabilities found. All transactional and analytics queries are strictly user-scoped with user_id == current_user.id.
+PII Scrubbing: Active for Indian PAN, Aadhaar, credit card numbers, CVVs, and account numbers prior to OCR/LLM processing.
+AI Tool Sandbox: LLMs cannot query the database directly or invent numbers; all computations are executed deterministically.

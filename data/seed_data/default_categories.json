@@ -1,0 +1,11 @@
+[
+  {"name": "Food & Dining", "group_type": "Want", "icon": "Utensils", "color": "#F59E0B"},
+  {"name": "Groceries", "group_type": "Need", "icon": "ShoppingCart", "color": "#10B981"},
+  {"name": "Transportation", "group_type": "Need", "icon": "Car", "color": "#3B82F6"},
+  {"name": "Entertainment", "group_type": "Want", "icon": "Film", "color": "#EC4899"},
+  {"name": "Shopping", "group_type": "Want", "icon": "ShoppingBag", "color": "#8B5CF6"},
+  {"name": "Utilities & Bills", "group_type": "Need", "icon": "Zap", "color": "#EF4444"},
+  {"name": "Healthcare & Fitness", "group_type": "Need", "icon": "HeartPulse", "color": "#14B8A6"},
+  {"name": "Investment & Savings", "group_type": "Savings", "icon": "TrendingUp", "color": "#059669"},
+  {"name": "Income", "group_type": "Income", "icon": "Wallet", "color": "#22C55E"}
+]
