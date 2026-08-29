@@ -84,11 +84,12 @@ async def add_security_headers_middleware(request: Request, call_next):
     response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;"
     return response
 
-# SEC-02: Set clean CORS enabled origins
+# SEC-02: Set clean CORS enabled origins (supporting local dev, environment origins, and Vercel domains)
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origin_regex=r"^https://.*\.vercel\.app$",
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./finsight.db")
 
-    # CORS (Strict whitelist without wildcard origins when allow_credentials=True)
+    # CORS (Strict whitelist + dynamic origin support from environment)
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
