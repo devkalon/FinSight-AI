@@ -1,26 +1,13 @@
 'use client';
 
-/*
- * Entry experience — applies the FinSight AI design system (UI/UX Pro Max:
- * "Trust & Authority" pattern + "Minimalism & Swiss" style).
- * -------------------------------------------------------------------
- * Palette:   navy #0F172A · card #222735 · field #272F42 · line #334155
- *            trust gold (primary) #F59E0B · tech purple (accent, solid only) #8B5CF6
- *            text #F8FAFC · muted #94A3B8
- * Type:      IBM Plex Sans ("Financial Trust" pairing) — banking-grade, data-friendly.
- * Signature: a self-drawing "compounding curve" — one precise, meaningful graphic,
- *            in keeping with Swiss restraint (the only bold moment on the page).
- * Rule:      accent reserved for CTAs; no purple/pink gradients; 4.5:1 contrast; focus rings.
- */
-
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { ShieldCheck, Lock, ArrowRight, TrendingUp } from 'lucide-react';
+import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { API_BASE } from '@/lib/api';
 
 export function AuthScreen() {
-  const { login, loginWithGoogle, register } = useAuth();
+  const { login, register } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,41 +16,21 @@ export function AuthScreen() {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Google Prompt Modal for customizable Google user identity
-  const [showGooglePromptModal, setShowGooglePromptModal] = useState(false);
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
-  const [customGoogleName, setCustomGoogleName] = useState('');
-
   const handleGoogleClick = async () => {
     setErrorMsg('');
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/google/url`).catch(() => null);
-      if (res && res.ok) {
-        const data = await res.json();
-        if (data.client_id_configured && data.url) {
-          window.location.href = data.url;
-          return;
-        }
+      const res = await fetch(`${API_BASE}/auth/google/url`);
+      if (!res.ok) {
+        throw new Error('Failed to initiate Google OAuth');
       }
-      setShowGooglePromptModal(true);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Google sign-in failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCustomGoogleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customGoogleEmail) return;
-    setLoading(true);
-    try {
-      await loginWithGoogle({
-        email: customGoogleEmail,
-        full_name: customGoogleName || customGoogleEmail.split('@')[0],
-      });
-      setShowGooglePromptModal(false);
+      const data = await res.json();
+      if (data.client_id_configured && data.url) {
+        window.location.href = data.url;
+        return;
+      } else {
+        setErrorMsg('Google OAuth is not configured on this server. Please set GOOGLE_CLIENT_ID in your backend environment variables.');
+      }
     } catch (err: any) {
       setErrorMsg(err.message || 'Google sign-in failed');
     } finally {
@@ -77,6 +44,9 @@ export function AuthScreen() {
     setLoading(true);
     try {
       if (isRegister) {
+        if (!fullName || !email || !password) {
+          throw new Error('Please fill in all required fields');
+        }
         await register({
           email,
           password,
@@ -84,6 +54,9 @@ export function AuthScreen() {
           monthly_income: parseFloat(monthlyIncome) || 0,
         });
       } else {
+        if (!email || !password) {
+          throw new Error('Please enter both email and password');
+        }
         await login(email, password);
       }
     } catch (err: any) {
@@ -94,21 +67,21 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-[family-name:var(--font-body)] flex flex-col lg:flex-row">
-      {/* Signature panel: a compounding curve that draws itself on load. */}
+    <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] flex flex-col lg:flex-row">
+      {/* Signature panel */}
       <SignaturePanel isRegister={isRegister} />
 
       {/* Sign-in panel */}
       <div className="flex-1 flex flex-col items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-sm">
-          {/* Wordmark — the serif carries the personality */}
+          {/* Wordmark (mobile) */}
           <div className="mb-8 lg:hidden">
             <Wordmark />
           </div>
 
           {/* Intro */}
           <div className="mb-6">
-            <h2 className="font-[family-name:var(--font-display)] text-2xl sm:text-[28px] leading-tight text-white">
+            <h2 className="text-2xl sm:text-[28px] font-bold leading-tight text-white">
               {isRegister ? 'Start your ledger' : 'Welcome back'}
             </h2>
             <p className="mt-1.5 text-sm text-[#94A3B8]">
@@ -118,12 +91,12 @@ export function AuthScreen() {
             </p>
           </div>
 
-          {/* Google */}
+          {/* Google OAuth Button */}
           <button
             type="button"
             onClick={handleGoogleClick}
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-[#F2F4F3] text-slate-900 font-medium text-sm transition-colors flex items-center justify-center gap-2.5 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F172A]"
+            className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-[#F2F4F3] text-slate-900 font-medium text-sm transition-colors flex items-center justify-center gap-2.5 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B]"
           >
             <GoogleGlyph />
             <span>Continue with Google</span>
@@ -132,193 +105,102 @@ export function AuthScreen() {
           <div className="relative flex py-4 items-center">
             <div className="flex-grow border-t border-[#334155]" />
             <span className="flex-shrink mx-3 text-[#64748B] text-[11px] uppercase tracking-wider">or with email</span>
-    <div className="min-h-screen bg-[#0F172A] flex flex-col justify-between p-6 sm:p-10 font-[family-name:var(--font-sans)] selection:bg-[#F59E0B]/30 selection:text-white">
-      {/* Top Header */}
-      <header className="flex items-center justify-between max-w-6xl w-full mx-auto">
-        <Wordmark />
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#94A3B8]">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            FinSight Cloud
-          </span>
-          <span className="text-xs text-[#94A3B8] border border-[#334155] px-2.5 py-1 rounded-md bg-[#222735]/60">
-            v1.0
-          </span>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="flex-1 flex items-center justify-center py-12 max-w-6xl w-full mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center w-full">
-          
-          {/* Left Column: Swiss Manifesto & Compounding Curve */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] text-xs font-semibold uppercase tracking-wider">
-                <TrendingUp className="w-3.5 h-3.5" />
-                Wealth Intelligence System
-              </div>
-              <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]">
-                Clear numbers.<br />
-                <span className="text-[#F59E0B]">Total conviction.</span>
-              </h1>
-              <p className="text-base sm:text-lg text-[#94A3B8] max-w-xl leading-relaxed">
-                Autonomous financial intelligence built for the Indian economy. Bank statement parsing, UPI tracking, anomaly detection, and agentic multi-guru advisory.
-              </p>
-            </div>
-
-            {/* Signature Graphic: The Compounding Curve */}
-            <div className="relative p-6 sm:p-8 rounded-2xl bg-[#222735]/50 border border-[#334155] overflow-hidden">
-              <div className="flex items-baseline justify-between mb-4">
-                <div>
-                  <p className="text-xs uppercase tracking-wider text-[#94A3B8]">The Power of Discipline</p>
-                  <p className="text-2xl font-bold text-white tracking-tight mt-0.5">Compounding Trajectory</p>
-                </div>
-                <span className="text-xs font-mono font-semibold text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-1 rounded border border-[#F59E0B]/20">
-                  +18.4% YoY
-                </span>
-              </div>
-              <CompoundingCurve />
-              <div className="grid grid-cols-3 gap-4 pt-6 mt-4 border-t border-[#334155]/60 text-xs text-[#94A3B8]">
-                <div>
-                  <p className="text-[#F8FAFC] font-semibold text-sm">3 Philosophies</p>
-                  <p className="text-[11px] text-[#94A3B8]">Buffett · Kiyosaki · Sethi</p>
-                </div>
-                <div>
-                  <p className="text-[#F8FAFC] font-semibold text-sm">₹-Native</p>
-                  <p className="text-[11px] text-[#94A3B8]">UPI · HDFC · ICICI · SBI</p>
-                </div>
-                <div>
-                  <p className="text-[#F8FAFC] font-semibold text-sm">Zero-Leak</p>
-                  <p className="text-[11px] text-[#94A3B8]">Deterministic OCR & Math</p>
-                </div>
-              </div>
-            </div>
+            <div className="flex-grow border-t border-[#334155]" />
           </div>
 
-          {/* Right Column: High-Contrast Auth Card */}
-          <div className="lg:col-span-5 w-full max-w-md mx-auto lg:max-w-none">
-            <div className="bg-[#222735] border border-[#334155] rounded-2xl p-7 sm:p-8 shadow-2xl space-y-6">
-              
-              {/* Segmented Switcher */}
-              <div className="grid grid-cols-2 p-1 rounded-xl bg-[#272F42] border border-[#334155]">
-                <button
-                  type="button"
-                  onClick={() => { setIsRegister(false); setErrorMsg(''); }}
-                  className={`py-2 text-xs font-semibold rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] ${
-                    !isRegister
-                      ? 'bg-[#F59E0B] text-[#0F172A] shadow-sm'
-                      : 'text-[#94A3B8] hover:text-white'
-                  }`}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setIsRegister(true); setErrorMsg(''); }}
-                  className={`py-2 text-xs font-semibold rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] ${
-                    isRegister
-                      ? 'bg-[#F59E0B] text-[#0F172A] shadow-sm'
-                      : 'text-[#94A3B8] hover:text-white'
-                  }`}
-                >
-                  Create Account
-                </button>
-              </div>
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 rounded-lg bg-[#222735] border border-[#334155] mb-5">
+            <button
+              type="button"
+              onClick={() => { setIsRegister(false); setErrorMsg(''); }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] ${
+                !isRegister ? 'bg-[#F59E0B] text-[#0F172A]' : 'text-[#94A3B8] hover:text-white'
+              }`}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsRegister(true); setErrorMsg(''); }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] ${
+                isRegister ? 'bg-[#F59E0B] text-[#0F172A]' : 'text-[#94A3B8] hover:text-white'
+              }`}
+            >
+              Create account
+            </button>
+          </div>
 
-              {/* Error Message */}
-              {errorMsg && (
-                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 flex-shrink-0" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
-
-              {/* Google OAuth Button */}
-              <button
-                type="button"
-                onClick={handleGoogleClick}
-                disabled={loading}
-                className="w-full py-2.5 px-4 rounded-lg bg-[#272F42] hover:bg-[#2E3852] border border-[#334155] text-white text-xs font-semibold flex items-center justify-center gap-3 transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B]"
-              >
-                <GoogleGlyph />
-                <span>Continue with Google</span>
-              </button>
-
-              <div className="flex items-center gap-3 text-xs text-[#94A3B8]">
-                <div className="flex-1 h-px bg-[#334155]" />
-                <span className="uppercase tracking-wider text-[10px]">or email</span>
-                <div className="flex-1 h-px bg-[#334155]" />
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {isRegister && (
-                  <Field
-                    label="Full Name"
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={setFullName}
-                    placeholder="Alex Mercer"
-                  />
-                )}
-
-                <Field
-                  label="Email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={setEmail}
-                  placeholder="alex.mercer@example.com"
-                />
-
-                <Field
-                  label="Password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={setPassword}
-                  placeholder="••••••••••••"
-                />
-
-                {isRegister && (
-                  <Field
-                    label="Monthly Net Income (₹)"
-                    type="number"
-                    value={monthlyIncome}
-                    onChange={setMonthlyIncome}
-                    placeholder="85000"
-                    hint="Used for initial 50/30/20 budget baselines"
-                  />
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full mt-2 py-3 px-4 rounded-lg bg-[#F59E0B] hover:bg-[#FBBF24] text-[#0F172A] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24] shadow-lg shadow-[#F59E0B]/20"
-                >
-                  <span>{loading ? 'Authenticating…' : isRegister ? 'Launch FinSight AI' : 'Access Dashboard'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </form>
-
-              {/* Trust Footer */}
-              <div className="pt-4 border-t border-[#334155]/60 flex items-center justify-between text-[11px] text-[#94A3B8]">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
-                  Encrypted at rest
-                </span>
-                <span className="text-[#334155]">•</span>
-                <span className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                  Your data stays yours
-                </span>
-              </div>
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded-lg bg-[#3F1D1D] border border-[#7F1D1D] text-[#FCA5A5] text-xs leading-relaxed">
+              {errorMsg}
             </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {isRegister && (
+              <Field
+                label="Your name"
+                type="text"
+                required
+                value={fullName}
+                onChange={setFullName}
+                placeholder="What should we call you?"
+              />
+            )}
+
+            <Field
+              label="Email"
+              type="email"
+              required
+              value={email}
+              onChange={setEmail}
+              placeholder="you@example.com"
+            />
+
+            <Field
+              label="Password"
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={setPassword}
+              placeholder={isRegister ? 'At least 8 characters' : 'Your password'}
+            />
+
+            {isRegister && (
+              <Field
+                label="Monthly income (₹) — optional"
+                type="number"
+                value={monthlyIncome}
+                onChange={setMonthlyIncome}
+                placeholder="Add it now, or later in Settings"
+              />
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-1 py-2.5 rounded-lg bg-[#F59E0B] hover:bg-[#FBBF24] text-[#0F172A] font-semibold text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
+            >
+              <span>{loading ? 'One moment…' : isRegister ? 'Create my account' : 'Sign in'}</span>
+              {!loading && <ArrowRight className="w-4 h-4" />}
+            </button>
+          </form>
+
+          {/* Trust line */}
+          <div className="mt-6 flex items-center justify-center gap-4 text-[11px] text-[#64748B]">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
+              Encrypted at rest
+            </span>
+            <span className="text-[#334155]">•</span>
+            <span className="flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-[#8B5CF6]" />
+              Your data stays yours
+            </span>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
@@ -329,9 +211,9 @@ function Wordmark() {
     <div className="flex flex-col items-start">
       <Image
         src="/logo.png"
-        alt="FinSight AI — Insights Today. Wealth Tomorrow."
-        width={220}
-        height={60}
+        alt="FinSight AI"
+        width={200}
+        height={54}
         className="object-contain"
         priority
       />
@@ -379,11 +261,10 @@ function GoogleGlyph() {
   );
 }
 
-/* ---- Signature: a compounding curve that draws itself on load ---- */
+/* ---- Signature Panel ---- */
 function SignaturePanel({ isRegister }: { isRegister: boolean }) {
   return (
     <div className="relative hidden lg:flex lg:w-[46%] flex-col justify-between overflow-hidden border-r border-[#1E293B] bg-[#0B1120] p-10">
-      {/* ambient wash */}
       <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#F59E0B]/10 blur-[110px]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-[#8B5CF6]/[0.06] blur-[90px]" />
 
@@ -391,7 +272,6 @@ function SignaturePanel({ isRegister }: { isRegister: boolean }) {
         <Wordmark />
       </div>
 
-      {/* the curve */}
       <div className="relative z-10 my-8 flex-1 flex items-center">
         <svg viewBox="0 0 400 220" className="w-full" role="img" aria-label="An upward compounding curve">
           {[0, 55, 110, 165].map((y) => (
@@ -410,7 +290,7 @@ function SignaturePanel({ isRegister }: { isRegister: boolean }) {
       </div>
 
       <div className="relative z-10 max-w-xs">
-        <p className="font-[family-name:var(--font-display)] text-xl leading-snug text-white">
+        <p className="text-xl font-bold leading-snug text-white">
           {isRegister ? 'Every fortune starts at zero.' : 'Small, steady, compounding.'}
         </p>
         <p className="mt-2 text-sm text-[#94A3B8]">
@@ -431,9 +311,3 @@ function SignaturePanel({ isRegister }: { isRegister: boolean }) {
     </div>
   );
 }
-
-
-
-
-
-
