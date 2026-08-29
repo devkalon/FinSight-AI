@@ -57,6 +57,7 @@ class BankStatementParseResponse(BaseModel):
     document_id: str
     filename: str
     total_parsed_transactions: int
+    total_extracted_transactions: Optional[int] = None
     transactions: List[Dict[str, Any]]
     candidates: List[CandidateTransaction] = []
     account_summary: Optional[Dict[str, Any]] = None

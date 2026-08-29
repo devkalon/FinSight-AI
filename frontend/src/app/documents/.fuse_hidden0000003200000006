@@ -1,0 +1,561 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  FileText,
+  UploadCloud,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Sparkles,
+  Edit2,
+  Trash2,
+  Check,
+  X,
+  FileSpreadsheet,
+  Receipt,
+  FileCode,
+  ArrowRight,
+  RefreshCw,
+  Eye,
+  AlertTriangle,
+  Scale,
+  Building2
+} from 'lucide-react';
+import {
+  api,
+  FinancialDocument,
+  CandidateTransaction,
+  Category,
+  DocumentIngestionResponse
+} from '@/lib/api';
+import { formatCurrency, formatDate } from '@/lib/utils';
+
+export default function DocumentsPage() {
+  const [documents, setDocuments] = useState<FinancialDocument[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Ingestion States
+  const [uploadMode, setUploadMode] = useState<'receipt' | 'statement'>('statement');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStage, setProcessingStage] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Verification Modal / Review State
+  const [activeIngestion, setActiveIngestion] = useState<DocumentIngestionResponse | null>(null);
+  const [candidateList, setCandidateList] = useState<CandidateTransaction[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [docs, cats] = await Promise.all([
+        api.getDocuments(),
+        api.getCategories()
+      ]);
+      setDocuments(docs);
+      setCategories(cats);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Handle File Selection
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError('');
+    setSuccessMessage('');
+    setIsProcessing(true);
+    setProcessingStage('Validating format & Indian banking headers...');
+
+    try {
+      await new Promise(r => setTimeout(r, 300));
+      setProcessingStage('Detecting Bank Adapter (HDFC / SBI / ICICI / UPI / Generic)...');
+      
+      let res: DocumentIngestionResponse;
+      if (uploadMode === 'receipt') {
+        res = await api.uploadReceipt(file);
+      } else {
+        res = await api.uploadBankStatement(file);
+      }
+
+      setProcessingStage('Scanning for duplicate ledger transactions & running integrity checks...');
+      await new Promise(r => setTimeout(r, 300));
+
+      setActiveIngestion(res);
+      setCandidateList(res.candidates || []);
+      loadData();
+    } catch (err: any) {
+      setUploadError(err.message || 'File ingestion failed');
+    } finally {
+      setIsProcessing(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }
+
+  // Candidate Field Edit Handler
+  function updateCandidateField(index: number, field: keyof CandidateTransaction, value: any) {
+    setCandidateList(prev => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  }
+
+  // Candidate Removal
+  function removeCandidateRow(index: number) {
+    setCandidateList(prev => prev.filter((_, idx) => idx !== index));
+  }
+
+  // Confirm and Commit to Financial Ledger
+  async function handleConfirmCandidates() {
+    if (!activeIngestion) return;
+    setIsConfirming(true);
+    setUploadError('');
+
+    try {
+      const res = await api.confirmDocumentCandidates(activeIngestion.document_id, candidateList);
+      setSuccessMessage(res.message);
+      setActiveIngestion(null);
+      setCandidateList([]);
+      loadData();
+    } catch (err: any) {
+      setUploadError(err.message || 'Failed to confirm transactions');
+    } finally {
+      setIsConfirming(false);
+    }
+  }
+
+  async function handleDeleteDocument(id: string) {
+    if (!confirm('Are you sure you want to delete this document?')) return;
+    try {
+      await api.deleteDocument(id);
+      loadData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete');
+    }
+  }
+
+  const accountSummary = activeIngestion?.account_summary;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Statement & Document Ingestion</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Multi-source ingestion for Indian bank statements (HDFC, SBI, ICICI, Axis), UPI exports (PhonePe, GPay, Paytm), and receipt PDFs with duplicate detection.
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <span className="text-xs text-emerald-400 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" /> Normalization Active
+          </span>
+        </div>
+      </div>
+
+      {uploadError && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{uploadError}</span>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {/* Ingestion Upload Card */}
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-5 shadow-xl">
+        {/* Upload Mode Selector */}
+        <div className="flex items-center space-x-2 border-b border-[#1E293B] pb-4">
+          <button
+            onClick={() => setUploadMode('statement')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              uploadMode === 'statement'
+                ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200 bg-[#222735]'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Bank Statement / UPI Export (PDF & CSV)</span>
+          </button>
+          <button
+            onClick={() => setUploadMode('receipt')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              uploadMode === 'receipt'
+                ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200 bg-[#222735]'
+            }`}
+          >
+            <Receipt className="w-4 h-4" />
+            <span>Payment Screenshot / Receipt (OCR / PDF)</span>
+          </button>
+        </div>
+
+        {/* Drag and Drop Zone */}
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="border-2 border-dashed border-[#1E293B] hover:border-amber-500/50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-[#222735]/40 hover:bg-[#222735]/70 transition-all group"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileUpload}
+            accept={uploadMode === 'statement' ? '.pdf,.csv' : '.png,.jpg,.jpeg,.webp,.bmp,.pdf'}
+            className="hidden"
+          />
+
+          <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform mb-3">
+            <UploadCloud className="w-8 h-8" />
+          </div>
+
+          <h3 className="text-slate-200 font-bold text-sm">
+            {isProcessing ? (
+              <span className="flex items-center gap-2 text-amber-400">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                {processingStage}
+              </span>
+            ) : (
+              <span>Click or drag and drop financial document to ingest</span>
+            )}
+          </h3>
+
+          <p className="text-slate-500 text-xs mt-1 text-center max-w-lg">
+            {uploadMode === 'statement'
+              ? 'Supports HDFC, SBI, ICICI, Axis statements (PDF/CSV) and PhonePe/GPay/Paytm UPI transaction exports (up to 15MB)'
+              : 'Supports Swiggy, Zomato, Amazon receipts, bills and payment screenshots in PNG, JPG, or PDF'}
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] text-slate-400 font-medium">
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">HDFC / SBI / ICICI Adapters</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">PhonePe & GPay UPI Parser</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">Duplicate Detection</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">Balance Integrity Check</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Candidate Verification Drawer / Modal */}
+      {activeIngestion && (
+        <div className="p-6 rounded-2xl bg-[#0F172A] border-2 border-amber-500/40 space-y-5 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1E293B] pb-4">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" /> Extracted Candidates Awaiting User Confirmation
+                </span>
+                {accountSummary?.bank_adapter && (
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono">
+                    {accountSummary.bank_adapter}
+                  </span>
+                )}
+              </div>
+              <h2 className="text-lg font-bold text-white mt-0.5">
+                Review & Edit Transactions from <span className="text-amber-300 font-mono text-sm">{activeIngestion.filename}</span>
+              </h2>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-xs px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
+                Avg Confidence: {Math.round(activeIngestion.confidence_avg * 100)}%
+              </span>
+              <button
+                onClick={() => setActiveIngestion(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#1E293B]"
+                title="Dismiss review"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Statement Balance Integrity Banner */}
+          {accountSummary && (accountSummary.opening_balance !== null || accountSummary.is_balanced !== undefined) && (
+            <div className={`p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-3 text-xs ${
+              accountSummary.is_balanced
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                : 'bg-amber-500/10 border-amber-500/20 text-amber-300'
+            }`}>
+              <div className="flex items-center space-x-2 font-medium">
+                <Scale className="w-4 h-4" />
+                <span>
+                  {accountSummary.is_balanced
+                    ? 'Statement Equation Balanced: Total Credits & Debits match closing balance.'
+                    : `Balance Discrepancy: ₹${accountSummary.balance_discrepancy || 0}`}
+                </span>
+              </div>
+              <div className="flex items-center space-x-4 text-[11px] font-mono text-slate-300">
+                <span>Total Debits: ₹{accountSummary.total_debits || 0}</span>
+                <span>Total Credits: ₹{accountSummary.total_credits || 0}</span>
+                {accountSummary.closing_balance && <span>Closing: ₹{accountSummary.closing_balance}</span>}
+              </div>
+            </div>
+          )}
+
+          <p className="text-slate-400 text-xs">
+            Review and adjust extracted candidate records before committing to your verified financial ledger. Rows flagged as potential duplicates can be removed or verified.
+          </p>
+
+          {/* Editable Candidate Rows */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#222735] text-slate-400 uppercase font-semibold border-b border-[#1E293B]">
+                <tr>
+                  <th className="px-3 py-3">Description *</th>
+                  <th className="px-3 py-3">Merchant / Payee</th>
+                  <th className="px-3 py-3">Amount (₹) *</th>
+                  <th className="px-3 py-3">Type</th>
+                  <th className="px-3 py-3">Category</th>
+                  <th className="px-3 py-3">Date</th>
+                  <th className="px-3 py-3">Payment Mode</th>
+                  <th className="px-3 py-3 text-center">Status</th>
+                  <th className="px-3 py-3 text-center">Confidence</th>
+                  <th className="px-3 py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1E293B]">
+                {candidateList.map((cand, idx) => (
+                  <tr key={cand.id || idx} className={`hover:bg-[#222735]/40 ${cand.is_duplicate ? 'bg-amber-500/5' : ''}`}>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="text"
+                        value={cand.description}
+                        onChange={(e) => updateCandidateField(idx, 'description', e.target.value)}
+                        className="w-full p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      />
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="text"
+                        value={cand.merchant_name || ''}
+                        placeholder="Merchant name"
+                        onChange={(e) => updateCandidateField(idx, 'merchant_name', e.target.value)}
+                        className="w-full p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      />
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={cand.amount}
+                        onChange={(e) => updateCandidateField(idx, 'amount', parseFloat(e.target.value) || 0)}
+                        className="w-24 p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 font-semibold focus:outline-none focus:border-amber-500"
+                      />
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <select
+                        value={cand.transaction_type}
+                        onChange={(e) => updateCandidateField(idx, 'transaction_type', e.target.value)}
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="debit">Debit</option>
+                        <option value="credit">Credit</option>
+                      </select>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <select
+                        value={cand.category_suggestion || ''}
+                        onChange={(e) => updateCandidateField(idx, 'category_suggestion', e.target.value)}
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="">General</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="date"
+                        value={cand.transaction_date}
+                        onChange={(e) => updateCandidateField(idx, 'transaction_date', e.target.value)}
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      />
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <select
+                        value={cand.payment_method || 'UPI'}
+                        onChange={(e) => updateCandidateField(idx, 'payment_method', e.target.value)}
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="UPI">UPI</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Net Banking">Net Banking</option>
+                        <option value="Cash">Cash</option>
+                      </select>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      {cand.is_duplicate ? (
+                        <span
+                          title={cand.duplicate_reason || 'Duplicate detected'}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        >
+                          <AlertTriangle className="w-3 h-3" /> Duplicate
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <Check className="w-3 h-3" /> New
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                          (cand.confidence_score || 0.9) >= 0.85
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        }`}
+                      >
+                        {Math.round((cand.confidence_score || 0.9) * 100)}%
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <button
+                        onClick={() => removeCandidateRow(idx)}
+                        className="p-1 text-slate-500 hover:text-rose-400 rounded transition-colors"
+                        title="Remove candidate"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t border-[#1E293B]">
+            <span className="text-xs text-slate-400">
+              Total candidates: <span className="font-semibold text-slate-200">{candidateList.length}</span>
+            </span>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setActiveIngestion(null)}
+                className="px-4 py-2 rounded-xl bg-[#272F42] hover:bg-[#1E293B] text-slate-300 font-semibold text-xs transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isConfirming || candidateList.length === 0}
+                onClick={handleConfirmCandidates}
+                className="flex items-center space-x-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-500/25 transition-all disabled:opacity-50"
+              >
+                <Check className="w-4 h-4" />
+                <span>{isConfirming ? 'Committing...' : 'Confirm & Commit to Ledger'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ingested Documents History Ledger */}
+      <div className="rounded-2xl bg-[#0F172A] border border-[#1E293B] overflow-hidden shadow-lg">
+        <div className="p-4 bg-[#222735] border-b border-[#1E293B] flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            Document Ingestion Log & Ingested Files
+          </span>
+          <button
+            onClick={loadData}
+            className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-slate-200"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-slate-400 text-xs uppercase font-semibold border-b border-[#1E293B] bg-[#222735]/50">
+              <tr>
+                <th className="px-6 py-4">Filename</th>
+                <th className="px-6 py-4">Type</th>
+                <th className="px-6 py-4">Size</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Date Ingested</th>
+                <th className="px-6 py-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#1E293B]">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-10 text-center text-slate-400 text-xs">
+                    Loading documents...
+                  </td>
+                </tr>
+              ) : documents.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-10 text-center text-slate-400 text-xs">
+                    No documents ingested yet. Upload an Indian bank statement or UPI export above.
+                  </td>
+                </tr>
+              ) : (
+                documents.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-[#222735]/50 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-slate-200 flex items-center space-x-2.5">
+                      <FileText className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span className="truncate max-w-xs">{doc.filename}</span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-400 text-xs capitalize">
+                      {doc.file_type.replace(/_/g, ' ')}
+                    </td>
+                    <td className="px-6 py-4 text-slate-400 text-xs">
+                      {doc.file_size_bytes ? `${Math.round(doc.file_size_bytes / 1024)} KB` : 'N/A'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                          doc.processing_status === 'confirmed'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : doc.processing_status === 'pending_verification'
+                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        }`}
+                      >
+                        {doc.processing_status === 'confirmed' ? (
+                          <CheckCircle2 className="w-3 h-3" />
+                        ) : (
+                          <Clock className="w-3 h-3" />
+                        )}
+                        <span className="capitalize">{doc.processing_status.replace(/_/g, ' ')}</span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-400 text-xs">
+                      {formatDate(doc.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
+                        title="Delete Document"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

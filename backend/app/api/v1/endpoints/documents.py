@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid
+import logging
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +20,8 @@ from backend.app.schemas.document import (
 )
 from backend.app.services.ingestion.document_service import document_service
 from backend.app.api.deps import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -75,8 +78,14 @@ async def delete_document(
     if doc.storage_path and os.path.exists(doc.storage_path):
         try:
             os.remove(doc.storage_path)
-        except Exception as e:
-            pass
+        except OSError as exc:
+            # Don't fail the request if the file is already gone or locked, but
+            # do surface it in logs so orphaned files / permission issues are
+            # diagnosable instead of silently swallowed.
+            logger.warning(
+                "Failed to delete stored file %s for document %s: %s",
+                doc.storage_path, doc.id, exc
+            )
 
     await db.delete(doc)
     await db.commit()

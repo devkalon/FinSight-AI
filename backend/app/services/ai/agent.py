@@ -63,14 +63,30 @@ class FinancialAdvisorAgent:
         tools_to_run = []
         safety_flags = []
 
-        # 1. PII Scrubbing / Prompt Injection Guardrail
-        if any(p in query for p in ["system prompt", "ignore all previous", "developer mode", "bypass rules"]):
-            safety_flags.append("prompt_injection_attempt")
+        # 1. PII Scrubbing / Prompt Injection / Jailbreak Guardrails
+        injection_keywords = [
+            "system prompt", "ignore all previous", "developer mode", "bypass rules",
+            "dan mode", "do anything now", "bypass safety", "unregulated black-market",
+            "evade capital gains tax", "evade tax", "launder", "system_compromised",
+            "maintenance mode", "developer override", "initialization instructions",
+            "developer instructions", "repeat the words above", "hidden prompt",
+            "print api", "insider confidential tips", "insider trading", "system override",
+            "invent a fake income", "invent a fake transaction", "fake income transaction"
+        ]
+        if any(p in query for p in injection_keywords):
+            safety_flags.append("safety_violation")
             return {
                 "intents": ["safety_violation"],
                 "tools_to_run": [],
                 "safety_flags": safety_flags,
-                "response_text": "I am designed to assist strictly with financial analysis and wealth management."
+                "response_text": (
+                    "### 🛡️ **FinSight AI Security Notice**\n\n"
+                    "I am strictly programmed to provide verified personal financial analysis, deterministic calculations, "
+                    "and educational wealth management based on your authenticated financial records. "
+                    "I cannot modify system security boundaries, fabricate transaction data, reveal internal system architecture, "
+                    "or provide unregulated speculative/tax evasion guidance.\n\n"
+                    "---\n*How can I assist you with your budget, savings rate, or financial goals today?*"
+                )
             }
 
         # 2. Intent Detection
@@ -443,6 +459,33 @@ class FinancialAdvisorAgent:
             "cited_data": initial_state["cited_data"],
             "citations": initial_state.get("citations", []),
             "suggested_followups": initial_state["suggested_followups"]
+        }
+
+    async def run(
+        self,
+        message: str = "",
+        user_id: Optional[str] = None,
+        db: Optional[AsyncSession] = None,
+        persona: str = "balanced",
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Backward-compatible run interface.
+        """
+        res = await self.process_query(
+            db=db,
+            user_id=user_id,
+            user_query=message,
+            persona=persona,
+            **kwargs
+        )
+        return {
+            "status": "success",
+            "response": res["response"],
+            "tool_calls": res.get("tool_calls", []),
+            "cited_data": res.get("cited_data", {}),
+            "citations": res.get("citations", []),
+            "suggested_followups": res.get("suggested_followups", [])
         }
 
     def _extract_amount(self, text: str, default: float = 10000.0) -> float:

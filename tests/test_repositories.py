@@ -44,7 +44,16 @@ async def test_user_repository():
 @pytest.mark.asyncio
 async def test_category_and_rules_repository():
     async with AsyncSessionLocal() as db:
-        user_id = str(uuid.uuid4())
+        user = User(
+            email=f"catuser_{uuid.uuid4().hex[:8]}@finsight.ai",
+            hashed_password=get_password_hash("SecretPass123!"),
+            is_active=True
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        user_id = user.id
+
         cat = Category(
             user_id=user_id,
             name=f"Fitness_{uuid.uuid4().hex[:6]}",
@@ -72,7 +81,16 @@ async def test_category_and_rules_repository():
 @pytest.mark.asyncio
 async def test_transaction_repository():
     async with AsyncSessionLocal() as db:
-        user_id = str(uuid.uuid4())
+        user = User(
+            email=f"txuser_{uuid.uuid4().hex[:8]}@finsight.ai",
+            hashed_password=get_password_hash("SecretPass123!"),
+            is_active=True
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        user_id = user.id
+
         tx = Transaction(
             user_id=user_id,
             amount=Decimal("850.00"),

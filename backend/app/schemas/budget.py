@@ -4,10 +4,12 @@ from pydantic import BaseModel
 from backend.app.schemas.category import CategoryOut
 
 class BudgetBase(BaseModel):
-    category_id: str
+    category_id: Optional[str] = None
+    category_name: Optional[str] = None
     monthly_limit: float
     period: Optional[str] = "monthly"
     alert_threshold_percentage: Optional[int] = 80
+    warning_threshold_pct: Optional[float] = None
 
 class BudgetCreate(BudgetBase):
     pass

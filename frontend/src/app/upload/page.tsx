@@ -124,45 +124,69 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1D263B] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Document Ingestion & OCR</h1>
-          <p className="text-slate-400 text-xs mt-0.5">
-            Extract, verify, and commit transactions from bank statements, UPI exports, and receipts.
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Document Ingestion & OCR Pipeline</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Upload bank statements, UPI exports, or receipts. Our OCR pipeline extracts, categorizes, and commits transactions with your review.
           </p>
         </div>
 
         {/* Upload Mode Switcher */}
-        <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-[#0A0E1A] border border-[#1D263B] text-xs">
+        <div className="flex items-center space-x-1 p-1 rounded-lg bg-[#0F172A] border border-[#1E293B] text-xs">
           <button
             onClick={() => setUploadMode('statement')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
               uploadMode === 'statement'
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-amber-500 text-[#0F172A]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>Bank Statement (CSV/PDF)</span>
+            <span>Bank Statement</span>
           </button>
           <button
             onClick={() => setUploadMode('receipt')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
               uploadMode === 'receipt'
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-amber-500 text-[#0F172A]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
-            <span>Receipt / Invoice (OCR)</span>
+            <span>Receipt / OCR</span>
           </button>
         </div>
       </div>
 
+      {/* Multi-Step Pipeline Indicator */}
+      <div className="grid grid-cols-5 gap-2 p-3 rounded-xl bg-[#0F172A] border border-[#1E293B] text-center text-xs">
+        <div className={`p-2 rounded-lg border transition-all ${!isProcessing && !activeIngestion ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 1</span>
+          <span>1. Upload</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${isProcessing && processingStage.includes('Reading') ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 2</span>
+          <span>2. Processing</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${isProcessing && processingStage.includes('merchant') ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 3</span>
+          <span>3. Extraction</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${activeIngestion && candidateList.length > 0 ? 'bg-amber-600/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 4</span>
+          <span>4. Verification</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${successMessage.includes('committed') ? 'bg-emerald-600/10 border-emerald-500/30 text-emerald-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 5</span>
+          <span>5. Confirmation</span>
+        </div>
+      </div>
+
       {/* Upload Dropzone */}
-      <div className="p-8 rounded-2xl bg-[#0F1626] border-2 border-dashed border-[#1D263B] hover:border-blue-500/50 transition-all text-center space-y-4">
+      <div className="p-8 rounded-xl bg-[#222735] border-2 border-dashed border-[#1E293B] hover:border-amber-500/50 transition-all text-center space-y-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -173,40 +197,40 @@ export default function UploadPage() {
         />
 
         <label htmlFor="file-upload" className="cursor-pointer block space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mx-auto text-blue-400">
-            <UploadCloud className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
+            <UploadCloud className="w-6 h-6" />
           </div>
 
           <div>
-            <span className="font-bold text-white text-sm">
-              Click to upload or drag and drop your {uploadMode === 'statement' ? 'Bank Statement' : 'Receipt / Bill'}
+            <span className="font-semibold text-white text-sm">
+              Click to upload or drag & drop your {uploadMode === 'statement' ? 'Bank Statement' : 'Receipt / Bill'}
             </span>
             <p className="text-slate-400 text-xs mt-1">
               Supports HDFC, SBI, ICICI, PhonePe, Google Pay, Razorpay receipts & multi-page statements.
             </p>
           </div>
 
-          <div className="flex items-center justify-center space-x-2 text-[11px] text-emerald-400 font-semibold pt-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Local PII Scrubber Active: Sensitive account numbers redacted before processing</span>
+          <div className="flex items-center justify-center space-x-2 text-[11px] text-emerald-400 font-medium pt-1">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>PII Scrubber Active: Account numbers and cards masked automatically</span>
           </div>
         </label>
 
         {isProcessing && (
-          <div className="p-4 rounded-xl bg-[#0A0E1A] border border-[#1D263B] space-y-2 text-xs text-blue-400 animate-pulse">
-            <RefreshCw className="w-4 h-4 animate-spin mx-auto text-blue-400" />
+          <div className="p-3.5 rounded-lg bg-[#0F172A] border border-[#1E293B] flex items-center justify-center space-x-2.5 text-xs text-amber-400">
+            <RefreshCw className="w-4 h-4 animate-spin" />
             <span>{processingStage}</span>
           </div>
         )}
 
         {uploadError && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
             {uploadError}
           </div>
         )}
 
         {successMessage && (
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
             {successMessage}
           </div>
         )}
@@ -214,24 +238,24 @@ export default function UploadPage() {
 
       {/* Candidate Transactions Review Stage */}
       {activeIngestion && candidateList.length > 0 && (
-        <div className="p-6 rounded-2xl bg-[#0F1626] border border-blue-500/30 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#1D263B] pb-3">
+        <div className="p-5 rounded-xl bg-[#222735] border border-amber-500/30 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
             <div>
-              <h2 className="font-bold text-white text-base">Verify Candidate Transactions ({candidateList.length})</h2>
-              <p className="text-slate-400 text-xs">Edit values if needed before committing into the permanent financial ledger.</p>
+              <h2 className="font-semibold text-white text-sm">Review Candidate Transactions ({candidateList.length})</h2>
+              <p className="text-slate-400 text-xs mt-0.5">Edit values if needed before committing into the permanent ledger.</p>
             </div>
 
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setActiveIngestion(null)}
-                className="px-3 py-1.5 rounded-lg bg-[#0A0E1A] hover:bg-[#12192B] border border-[#1D263B] text-slate-400 text-xs font-semibold transition-all"
+                className="px-3 py-1.5 rounded-lg bg-[#0F172A] hover:bg-[#272F42] border border-[#1E293B] text-slate-400 text-xs font-medium transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmAndCommit}
                 disabled={isConfirming}
-                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all"
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-all"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>{isConfirming ? 'Committing...' : 'Commit to Ledger'}</span>
@@ -241,25 +265,25 @@ export default function UploadPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-[#0A0E1A] text-slate-400 uppercase text-[10px]">
+              <thead className="bg-[#0F172A] text-slate-400 uppercase text-[10px]">
                 <tr>
-                  <th className="p-2.5 rounded-l-lg">Date</th>
-                  <th className="p-2.5">Description</th>
-                  <th className="p-2.5">Type</th>
-                  <th className="p-2.5">Category</th>
-                  <th className="p-2.5">Amount (₹)</th>
-                  <th className="p-2.5 text-right rounded-r-lg">Action</th>
+                  <th className="p-2.5 rounded-l-lg font-semibold">Date</th>
+                  <th className="p-2.5 font-semibold">Description</th>
+                  <th className="p-2.5 font-semibold">Type</th>
+                  <th className="p-2.5 font-semibold">Category</th>
+                  <th className="p-2.5 font-semibold">Amount (₹)</th>
+                  <th className="p-2.5 text-right rounded-r-lg font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1D263B]">
+              <tbody className="divide-y divide-[#1E293B]">
                 {candidateList.map((c, idx) => (
-                  <tr key={idx} className="hover:bg-[#12192B]/50">
+                  <tr key={idx} className="hover:bg-[#272F42]/40">
                     <td className="p-2">
                       <input
                         type="date"
                         value={c.transaction_date ? String(c.transaction_date).split('T')[0] : ''}
                         onChange={(e) => handleCandidateChange(idx, 'transaction_date', e.target.value)}
-                        className="bg-[#0A0E1A] border border-[#1D263B] rounded-lg p-1 text-slate-200 text-xs"
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
                       />
                     </td>
                     <td className="p-2">
@@ -267,14 +291,14 @@ export default function UploadPage() {
                         type="text"
                         value={c.description}
                         onChange={(e) => handleCandidateChange(idx, 'description', e.target.value)}
-                        className="bg-[#0A0E1A] border border-[#1D263B] rounded-lg p-1 text-slate-200 text-xs w-48"
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs w-48"
                       />
                     </td>
                     <td className="p-2">
                       <select
                         value={c.transaction_type}
                         onChange={(e) => handleCandidateChange(idx, 'transaction_type', e.target.value)}
-                        className="bg-[#0A0E1A] border border-[#1D263B] rounded-lg p-1 text-slate-200 text-xs"
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
                       >
                         <option value="debit">Debit</option>
                         <option value="credit">Credit</option>
@@ -284,7 +308,7 @@ export default function UploadPage() {
                       <select
                         value={c.category_suggestion || ''}
                         onChange={(e) => handleCandidateChange(idx, 'category_suggestion', e.target.value)}
-                        className="bg-[#0A0E1A] border border-[#1D263B] rounded-lg p-1 text-slate-200 text-xs"
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
                       >
                         {categories.map((cat) => (
                           <option key={cat.id} value={cat.name}>{cat.name}</option>
@@ -296,7 +320,7 @@ export default function UploadPage() {
                         type="number"
                         value={c.amount}
                         onChange={(e) => handleCandidateChange(idx, 'amount', parseFloat(e.target.value) || 0)}
-                        className="bg-[#0A0E1A] border border-[#1D263B] rounded-lg p-1 text-slate-200 text-xs w-24 font-bold"
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs w-24 font-semibold tabular-nums"
                       />
                     </td>
                     <td className="p-2 text-right">
@@ -316,26 +340,32 @@ export default function UploadPage() {
       )}
 
       {/* Uploaded Documents History */}
-      <div className="p-6 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-4">
-        <h2 className="font-bold text-white text-base">Processed Statements & Receipts</h2>
+      <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-3">
+        <div className="flex items-center justify-between border-b border-[#1E293B] pb-2">
+          <h2 className="font-semibold text-white text-sm">Processed Statements & Receipts</h2>
+          <span className="text-[11px] text-slate-400">{documents.length} documents</span>
+        </div>
         {documents.length === 0 ? (
-          <p className="text-xs text-slate-400">No documents ingested yet. Upload your first statement or receipt above.</p>
+          <div className="py-6 text-center">
+            <FileText className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+            <p className="text-xs text-slate-400">No documents ingested yet. Upload your first statement or receipt above.</p>
+          </div>
         ) : (
-          <div className="divide-y divide-[#1D263B]">
+          <div className="divide-y divide-[#1E293B]">
             {documents.map((doc) => (
               <div key={doc.id} className="py-3 flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-xl bg-[#0A0E1A] border border-[#1D263B]">
-                    <FileText className="w-4 h-4 text-blue-400" />
+                  <div className="p-1.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
+                    <FileText className="w-3.5 h-3.5 text-amber-400" />
                   </div>
                   <div>
-                    <span className="font-semibold text-white">{doc.filename}</span>
-                    <div className="text-slate-400 text-[11px]">
-                      {doc.file_type?.toUpperCase()} • Uploaded on {formatDate(doc.created_at)}
+                    <span className="font-medium text-white">{doc.filename}</span>
+                    <div className="text-slate-400 text-[10px] mt-0.5">
+                      {doc.file_type?.toUpperCase()} · {formatDate(doc.created_at)}
                     </div>
                   </div>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold text-[10px] border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
                   {doc.processing_status?.toUpperCase() || 'PROCESSED'}
                 </span>
               </div>

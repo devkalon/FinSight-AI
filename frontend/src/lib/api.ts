@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000/api/v1";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 
 function getAuthHeaders(): HeadersInit {
   const token = typeof window !== "undefined" ? localStorage.getItem("finsight_token") : null;
@@ -9,6 +9,29 @@ function getAuthHeaders(): HeadersInit {
 
 function getAuthToken(): string | null {
   return typeof window !== "undefined" ? localStorage.getItem("finsight_token") : null;
+}
+
+// Centralized fetch that surfaces failures instead of silently swallowing them.
+// Network errors and non-2xx responses are logged and re-thrown so the UI can
+// render a real error state rather than plausible-looking fabricated data.
+async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      headers: getAuthHeaders(),
+      ...init,
+    });
+  } catch (e) {
+    console.error(`[api] Network error calling ${path}:`, e);
+    throw new Error(`Unable to reach the server. Please check your connection and try again.`);
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    const detail = err?.detail || `Request failed (${res.status})`;
+    console.error(`[api] ${path} failed:`, res.status, detail);
+    throw new Error(detail);
+  }
+  return res.json();
 }
 
 export interface Category {
@@ -518,22 +541,7 @@ export interface MonthlyReportData {
 
 export const api = {
   async getCategories(): Promise<Category[]> {
-    try {
-      const res = await fetch(`${API_BASE}/transactions/categories`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return [
-      { id: "c1", name: "Food & Dining", group_type: "Want", color: "#F59E0B" },
-      { id: "c2", name: "Groceries", group_type: "Need", color: "#10B981" },
-      { id: "c3", name: "Transportation", group_type: "Need", color: "#3B82F6" },
-      { id: "c4", name: "Shopping", group_type: "Want", color: "#8B5CF6" },
-      { id: "c5", name: "Entertainment", group_type: "Want", color: "#EC4899" },
-      { id: "c6", name: "Utilities & Bills", group_type: "Need", color: "#EF4444" },
-      { id: "c7", name: "Investment & Savings", group_type: "Savings", color: "#059669" },
-      { id: "c8", name: "Income", group_type: "Income", color: "#10B981" },
-    ];
+    return requestJson<Category[]>(`/transactions/categories`);
   },
 
   async getTransactions(params?: TransactionFilterParams): Promise<PaginatedResponse<Transaction>> {
@@ -656,13 +664,7 @@ export const api = {
   },
 
   async getDocuments(): Promise<FinancialDocument[]> {
-    try {
-      const res = await fetch(`${API_BASE}/documents/`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return [];
+    return requestJson<FinancialDocument[]>(`/documents/`);
   },
 
   async deleteDocument(id: string): Promise<void> {
@@ -681,156 +683,22 @@ export const api = {
     const params = new URLSearchParams();
     if (startDate) params.append("start_date", startDate);
     if (endDate) params.append("end_date", endDate);
-
-    try {
-      const res = await fetch(`${API_BASE}/analytics/dashboard?${params.toString()}`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-
-    // Representative fallback
-    return {
-      summary: {
-        total_income: 85000,
-        total_expenses: 34200,
-        net_savings: 50800,
-        savings_rate_pct: 59.8,
-        average_daily_spending: 1140,
-        days_in_period: 30,
-        transaction_count: 24,
-        currency: "INR"
-      },
-      month_over_month: {
-        income_change_pct: 12.5,
-        expense_change_pct: -6.2,
-        savings_change_pct: 28.4,
-        income_change_abs: 10000,
-        expense_change_abs: -2300,
-        savings_change_abs: 12300,
-        prev_period_income: 75000,
-        prev_period_expense: 36500,
-        prev_period_savings: 38500
-      },
-      spending_split: {
-        essential_amount: 18400,
-        essential_pct: 53.8,
-        discretionary_amount: 10800,
-        discretionary_pct: 31.6,
-        savings_investment_amount: 5000,
-        savings_investment_pct: 14.6
-      },
-      category_breakdown: [
-        { category_name: "Food & Dining", group_type: "Want", total_amount: 8450, percentage_of_total: 24.7, transaction_count: 12, color: "#F59E0B" },
-        { category_name: "Groceries", group_type: "Need", total_amount: 6200, percentage_of_total: 18.1, transaction_count: 6, color: "#10B981" },
-        { category_name: "Shopping", group_type: "Want", total_amount: 5400, percentage_of_total: 15.8, transaction_count: 4, color: "#8B5CF6" },
-        { category_name: "Bills & Utilities", group_type: "Need", total_amount: 4800, percentage_of_total: 14.0, transaction_count: 3, color: "#EF4444" },
-        { category_name: "Transport", group_type: "Need", total_amount: 3600, percentage_of_total: 10.5, transaction_count: 8, color: "#3B82F6" },
-        { category_name: "Investment", group_type: "Investment", total_amount: 5750, percentage_of_total: 16.9, transaction_count: 2, color: "#059669" }
-      ],
-      income_vs_expense_trends: [
-        { month: "Jan 2026", income: 75000, expense: 34200, savings: 40800, savings_rate_pct: 54.4 },
-        { month: "Feb 2026", income: 75000, expense: 31800, savings: 43200, savings_rate_pct: 57.6 },
-        { month: "Mar 2026", income: 82500, expense: 42500, savings: 40000, savings_rate_pct: 48.5 },
-        { month: "Apr 2026", income: 75000, expense: 29400, savings: 45600, savings_rate_pct: 60.8 },
-        { month: "May 2026", income: 85000, expense: 34200, savings: 50800, savings_rate_pct: 59.8 }
-      ],
-      largest_merchants: [
-        { merchant_name: "Swiggy & Zomato", total_amount: 8450, transaction_count: 12, percentage_of_expenses: 24.7 },
-        { merchant_name: "Amazon India", total_amount: 5400, transaction_count: 4, percentage_of_expenses: 15.8 },
-        { merchant_name: "Bescom Electricity", total_amount: 4800, transaction_count: 3, percentage_of_expenses: 14.0 },
-        { merchant_name: "Uber & Rapido", total_amount: 3600, transaction_count: 8, percentage_of_expenses: 10.5 },
-        { merchant_name: "Blinkit Quick Commerce", total_amount: 3200, transaction_count: 5, percentage_of_expenses: 9.4 }
-      ],
-      budget_utilization: [
-        { category_name: "Food & Dining", budgeted_amount: 12000, spent_amount: 8450, utilization_pct: 70.4, remaining_amount: 3550, is_over_budget: false, color: "#F59E0B" },
-        { category_name: "Shopping", budgeted_amount: 8000, spent_amount: 5400, utilization_pct: 67.5, remaining_amount: 2600, is_over_budget: false, color: "#8B5CF6" },
-        { category_name: "Transportation", budgeted_amount: 5000, spent_amount: 3600, utilization_pct: 72.0, remaining_amount: 1400, is_over_budget: false, color: "#3B82F6" },
-        { category_name: "Utilities & Bills", budgeted_amount: 6000, spent_amount: 4800, utilization_pct: 80.0, remaining_amount: 1200, is_over_budget: false, color: "#EF4444" }
-      ],
-      recurring_expenses: [
-        { service_name: "Netflix Premium", amount: 649, billing_cycle: "Monthly", next_billing_date: "2026-09-12", category_name: "Subscriptions", is_active: true },
-        { service_name: "Jio Fiber Broadband", amount: 825, billing_cycle: "Monthly", next_billing_date: "2026-09-05", category_name: "Bills", is_active: true },
-        { service_name: "Spotify Premium", amount: 179, billing_cycle: "Monthly", next_billing_date: "2026-09-22", category_name: "Subscriptions", is_active: true }
-      ]
-    };
+    return requestJson<ComprehensiveAnalyticsDashboard>(`/analytics/dashboard?${params.toString()}`);
   },
 
   async getHealthScore(): Promise<HealthScore> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/health-score`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return {
-      score: 78,
-      rating: "Good",
-      components: {
-        savings_rate: { name: "Savings Rate", score: 82, weight: 0.20, status: "Good", metric_value: "28.5%", description: "Saving 28.5% of monthly income" },
-        budget_adherence: { name: "Budget Adherence", score: 75, weight: 0.15, status: "Good", metric_value: "74.0% utilized", description: "Utilized 74% of planned monthly limits" },
-        debt_burden: { name: "Debt Burden", score: 91, weight: 0.15, status: "Excellent", metric_value: "12.0% DTI", description: "Manageable EMI debt obligations" },
-        emergency_fund: { name: "Emergency Fund", score: 63, weight: 0.15, status: "Fair", metric_value: "2.8 Months", description: "Liquid reserve covers 2.8 months (target: 6 months)" },
-        spending_consistency: { name: "Spending Consistency", score: 79, weight: 0.15, status: "Good", metric_value: "82% Stability", description: "Disciplined week-over-week spending" },
-        recurring_burden: { name: "Recurring Burden", score: 85, weight: 0.10, status: "Excellent", metric_value: "14.2% Fixed", description: "Low fixed recurring subscription burn" },
-        goal_progress: { name: "Goal Progress", score: 70, weight: 0.10, status: "Good", metric_value: "60.0% Avg", description: "On-track pacing on active financial goals" }
-      },
-      positive_factors: [
-        "Low debt-to-income ratio at 12.0% (comfortably below 30% risk threshold).",
-        "Healthy savings rate of 28.5% consistently exceeding the 50/30/20 benchmark.",
-        "Stable week-over-week spending discipline with no erratic spikes."
-      ],
-      negative_factors: [
-        "Emergency reserve covers 2.8 months of expenses (recommended buffer is 6 months).",
-        "Moderate discretionary budget burn in dining and entertainment."
-      ],
-      recommendations: [
-        "Increase automatic emergency reserve contribution by ₹5,000/month.",
-        "Set real-time budget threshold alerts on dining out."
-      ],
-      score_delta: 4,
-      delta_explanation: "Score increased by +4 points due to reduced discretionary dining out and higher net savings rate.",
-      emergency_fund_score: 16,
-      savings_rate_score: 21,
-      budget_adherence_score: 19,
-      debt_and_burn_score: 22,
-      insights: [
-        "Healthy savings rate of 28.5%.",
-        "Emergency reserve covers 2.8 months of living expenses."
-      ]
-    };
+    return requestJson<HealthScore>(`/analytics/health-score`);
   },
 
   async getHealthScoreHistory(limit: number = 20): Promise<HealthScoreHistoryPoint[]> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/health-score/history?limit=${limit}`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return data.history || [];
-      }
-    } catch (e) {}
-    return [
-      { id: "h1", score: 72, rating: "Good", calculated_at: "2026-06-01", component_scores: { savings_rate: 70, budget_adherence: 68, debt_burden: 88, emergency_fund: 55, spending_consistency: 74, recurring_burden: 82, goal_progress: 65 } },
-      { id: "h2", score: 74, rating: "Good", calculated_at: "2026-07-01", component_scores: { savings_rate: 76, budget_adherence: 72, debt_burden: 90, emergency_fund: 58, spending_consistency: 76, recurring_burden: 84, goal_progress: 68 } },
-      { id: "h3", score: 78, rating: "Good", calculated_at: "2026-08-01", component_scores: { savings_rate: 82, budget_adherence: 75, debt_burden: 91, emergency_fund: 63, spending_consistency: 79, recurring_burden: 85, goal_progress: 70 } },
-    ];
+    const data = await requestJson<{ history?: HealthScoreHistoryPoint[] }>(
+      `/analytics/health-score/history?limit=${limit}`
+    );
+    return data.history || [];
   },
 
   async getBudgets(): Promise<Budget[]> {
-    try {
-      const res = await fetch(`${API_BASE}/budgets/`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return [
-      { id: "b1", category_id: "c1", monthly_limit: 12000, spent_amount: 8450, remaining_amount: 3550, spent_percentage: 70.4, is_over_budget: false, warning_status: "normal", category: { name: "Food & Dining", color: "#F59E0B" } },
-      { id: "b2", category_id: "c2", monthly_limit: 8000, spent_amount: 3600, remaining_amount: 4400, spent_percentage: 45.0, is_over_budget: false, warning_status: "normal", category: { name: "Transportation", color: "#3B82F6" } },
-      { id: "b3", category_id: "c3", monthly_limit: 15000, spent_amount: 11200, remaining_amount: 3800, spent_percentage: 74.6, is_over_budget: false, warning_status: "normal", category: { name: "Shopping", color: "#8B5CF6" } },
-      { id: "b4", category_id: "c6", monthly_limit: 5000, spent_amount: 4450, remaining_amount: 550, spent_percentage: 89.0, is_over_budget: false, warning_status: "warning", warning_message: "Threshold Warning: You have utilized 89.0% of your Entertainment budget.", category: { name: "Entertainment", color: "#EC4899" } }
-    ];
+    return requestJson<Budget[]>(`/budgets/`);
   },
 
   async createBudget(data: { category_id: string; monthly_limit: number; alert_threshold_percentage?: number }): Promise<Budget> {
@@ -844,25 +712,15 @@ export const api = {
   },
 
   async deleteBudget(id: string): Promise<void> {
-    await fetch(`${API_BASE}/budgets/${id}`, {
+    const res = await fetch(`${API_BASE}/budgets/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
+    if (!res.ok) throw new Error("Failed to delete budget");
   },
 
   async getGoals(): Promise<Goal[]> {
-    try {
-      const res = await fetch(`${API_BASE}/goals/`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return [
-      { id: "g1", title: "Emergency Safety Reserve", category: "Emergency Fund", target_amount: 300000, current_amount: 180000, target_date: "2027-06-30", months_remaining: 10, remaining_amount: 120000, required_monthly_saving: 12000, required_monthly_sip: 10500, projected_completion_date: "June 2027", progress_percentage: 60.0, is_on_track: true, ai_recommendation: "On track! Saving ₹12,000/mo covers your target within 10 months." },
-      { id: "g2", title: "MacBook Pro M-Series", category: "Laptop Purchase", target_amount: 80000, current_amount: 23000, target_date: "2026-12-31", months_remaining: 4, remaining_amount: 57000, required_monthly_saving: 14250, required_monthly_sip: 14250, projected_completion_date: "December 2026", progress_percentage: 28.8, is_on_track: true, ai_recommendation: "To reach ₹80,000 by December 2026, allocate ₹14,250/mo. Your current monthly surplus supports this." },
-      { id: "g3", title: "Global Vacation Fund", category: "Travel", target_amount: 150000, current_amount: 75000, target_date: "2026-12-31", months_remaining: 4, remaining_amount: 75000, required_monthly_saving: 18750, required_monthly_sip: 18750, projected_completion_date: "December 2026", progress_percentage: 50.0, is_on_track: true, ai_recommendation: "Allocate ₹18,750/mo to complete your travel fund on schedule." },
-      { id: "g4", title: "Executive Leadership Certification", category: "Education", target_amount: 120000, current_amount: 40000, target_date: "2027-03-31", months_remaining: 7, remaining_amount: 80000, required_monthly_saving: 11428, required_monthly_sip: 11428, projected_completion_date: "March 2027", progress_percentage: 33.3, is_on_track: true, ai_recommendation: "Saving ₹11,428/mo will fund your education milestone by March 2027." }
-    ];
+    return requestJson<Goal[]>(`/goals/`);
   },
 
   async createGoal(data: { title: string; category?: string; target_amount: number; current_amount?: number; target_date: string; monthly_contribution?: number; expected_return_rate?: number }): Promise<Goal> {
@@ -886,156 +744,23 @@ export const api = {
   },
 
   async deleteGoal(id: string): Promise<void> {
-    await fetch(`${API_BASE}/goals/${id}`, {
+    const res = await fetch(`${API_BASE}/goals/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
+    if (!res.ok) throw new Error("Failed to delete goal");
   },
 
   async getForecast(): Promise<ForecastData> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/forecast`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    const points: ForecastPoint[] = [];
-    for (let i = 1; i <= 30; i++) {
-      const proj = 1150 + Math.sin(i / 3) * 200 + (i % 7 === 0 ? 400 : 0);
-      points.push({
-        date: `Day ${i}`,
-        projected_expense: Math.round(proj),
-        lower_bound: Math.round(proj * 0.82),
-        upper_bound: Math.round(proj * 1.20)
-      });
-    }
-    return {
-      predicted_monthly_total: 34500,
-      monthly_prediction_interval: {
-        lower_bound: 29500,
-        upper_bound: 40200,
-        confidence_level: 0.85
-      },
-      confidence_score: 0.88,
-      historical_average_daily: 1150,
-      projected_next_30_days_total: 34500,
-      projected_next_60_days_total: 69000,
-      projected_next_90_days_total: 103500,
-      estimated_runway_months: 24.5,
-      trend: "stable",
-      major_contributing_factors: [
-        "Consistent spending velocity across recent cycles",
-        "Historical average daily burn of ₹1,150.00",
-        "Weighted weekend seasonality factor (30% higher discretionary spend)"
-      ],
-      human_readable_explanation: "Based on your recent transactions, your projected monthly expenditure is ₹34,500.00 (estimated range: ₹29,500.00 – ₹40,200.00 with 88% statistical confidence). Spending trend is currently stable.",
-      disclaimer: "Statistical Projection Notice: Future expense forecasts are probabilistic mathematical estimates derived from historical spending patterns and recurring commitments. They do not constitute guaranteed outcomes.",
-      category_forecasts: [
-        { category_name: "Food & Dining", predicted_amount: 11200, percentage_of_total: 32.5, trend: "stable", prediction_interval: { lower_bound: 9500, upper_bound: 13200, confidence_level: 0.85 }, contributing_factors: ["Regular groceries and weekend dining pattern"] },
-        { category_name: "Housing & Rent", predicted_amount: 10000, percentage_of_total: 29.0, trend: "stable", prediction_interval: { lower_bound: 10000, upper_bound: 10000, confidence_level: 0.99 }, contributing_factors: ["Fixed monthly rental commitment"] },
-        { category_name: "Transportation", predicted_amount: 4200, percentage_of_total: 12.2, trend: "stable", prediction_interval: { lower_bound: 3400, upper_bound: 5100, confidence_level: 0.85 }, contributing_factors: ["Fuel & commute rides"] },
-        { category_name: "Utilities & Bills", predicted_amount: 3800, percentage_of_total: 11.0, trend: "stable", prediction_interval: { lower_bound: 3200, upper_bound: 4400, confidence_level: 0.90 }, contributing_factors: ["Broadband and electricity billing cycles"] },
-        { category_name: "Shopping & Entertainment", predicted_amount: 5300, percentage_of_total: 15.3, trend: "stable", prediction_interval: { lower_bound: 3900, upper_bound: 6800, confidence_level: 0.80 }, contributing_factors: ["Variable discretionary shopping"] }
-      ],
-      recurring_forecasts: [
-        { service_name: "Broadband Internet", amount: 999, billing_cycle: "Monthly", projected_annual_cost: 11988, category_name: "Bills" },
-        { service_name: "Digital Subscriptions", amount: 799, billing_cycle: "Monthly", projected_annual_cost: 9588, category_name: "Subscriptions" }
-      ],
-      total_recurring_projected: 1798,
-      total_variable_projected: 32702,
-      evaluation: {
-        model_name: "Trend-Decomposed Seasonal Exponential Smoothing",
-        baseline_model_name: "Simple Moving Average (Naive Baseline)",
-        mae: 142.50,
-        mape: 6.80,
-        rmse: 185.20,
-        baseline_mae: 215.40,
-        baseline_mape: 10.40,
-        baseline_rmse: 282.60,
-        accuracy_improvement_pct: 33.8,
-        evaluation_holdout_days: 10
-      },
-      forecast_points: points
-    };
+    return requestJson<ForecastData>(`/analytics/forecast`);
   },
 
   async getAnomalies(): Promise<AnomalySummary> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/anomalies`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return {
-      total_anomalies: 3,
-      critical_count: 1,
-      high_count: 1,
-      medium_count: 1,
-      total_excess_deviation: 15400,
-      has_sufficient_history: true,
-      anomalies: [
-        {
-          id: "anom-1",
-          anomaly_type: "category_spending",
-          severity: "critical",
-          metric: "category_period_spending",
-          entity_name: "Food & Dining",
-          observed_value: 15800,
-          expected_value: 6200,
-          deviation: "+154.8%",
-          deviation_pct: 154.8,
-          explanation: "Food spending reached ₹15,800, which is +154.8% above your typical baseline of ₹6,200.",
-          affected_transactions: [
-            { id: "t1", description: "Weekend Fine Dining", amount: 6500, merchant: "Bastian", transaction_date: "2026-08-25", category_name: "Food & Dining" },
-            { id: "t2", description: "Bulk Gourmet Delivery", amount: 4800, merchant: "Swiggy Gourmet", transaction_date: "2026-08-22", category_name: "Food & Dining" }
-          ],
-          detected_at: new Date().toISOString()
-        },
-        {
-          id: "anom-2",
-          anomaly_type: "transaction_amount",
-          severity: "high",
-          metric: "single_transaction_amount",
-          entity_name: "Apple Store",
-          observed_value: 45000,
-          expected_value: 2800,
-          deviation: "+1507.1%",
-          deviation_pct: 1507.1,
-          explanation: "Unusually large single transaction of ₹45,000 at Apple Store (Z-score: 3.82, typical median: ₹2,800).",
-          affected_transactions: [
-            { id: "t3", description: "Apple Store BKC", amount: 45000, merchant: "Apple Store", transaction_date: "2026-08-26", category_name: "Shopping" }
-          ],
-          detected_at: new Date().toISOString()
-        },
-        {
-          id: "anom-3",
-          anomaly_type: "recurring_change",
-          severity: "medium",
-          metric: "recurring_subscription_hike",
-          entity_name: "Netflix Premium",
-          observed_value: 649,
-          expected_value: 499,
-          deviation: "+30.1%",
-          deviation_pct: 30.1,
-          explanation: "Recurring subscription for Netflix increased from ₹499 to ₹649 (+30.1% price change).",
-          affected_transactions: [
-            { id: "t4", description: "Netflix Monthly Subscription", amount: 649, merchant: "Netflix", transaction_date: "2026-08-20", category_name: "Subscriptions" }
-          ],
-          detected_at: new Date().toISOString()
-        }
-      ]
-    };
+    return requestJson<AnomalySummary>(`/analytics/anomalies`);
   },
 
   async scanAnomalies(): Promise<AnomalySummary> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/anomalies/scan`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return this.getAnomalies();
+    return requestJson<AnomalySummary>(`/analytics/anomalies/scan`, { method: "POST" });
   },
 
   async runSimulation(payload: {
@@ -1053,126 +778,18 @@ export const api = {
     investment_roi?: number;
     timeline_months?: number;
   }): Promise<SimulationResult> {
-    try {
-      const res = await fetch(`${API_BASE}/analytics/simulation`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    
-    // Fallback deterministic simulation mock
-    const inc = 75000 + (75000 * ((payload.income_change_pct || 0) / 100)) + (payload.monthly_income_change || 0);
-    const expRed = (payload.food_spend_reduction || 0) + (payload.shopping_spend_reduction || 0) + (payload.discretionary_spend_reduction || 0) + (payload.removed_subscriptions_amount || 0);
-    const exp = Math.max(35000 - expRed, 10000);
-    const net = inc - exp;
-    const baseNet = 75000 - 35000;
-    const netDelta = net - baseNet;
-
-    return {
-      current_scenario: {
-        monthly_income: 75000,
-        monthly_expenses: 35000,
-        monthly_net_cash_flow: 40000,
-        savings_rate_pct: 53.3,
-        annual_savings: 480000,
-        total_budget_limit: 40250,
-        budget_utilization_pct: 87.0,
-        health_score: 78,
-        health_rating: "Good"
-      },
-      simulated_scenario: {
-        monthly_income: inc,
-        monthly_expenses: exp,
-        monthly_net_cash_flow: net,
-        savings_rate_pct: Math.round((net / inc) * 1000) / 10,
-        annual_savings: net * 12,
-        total_budget_limit: exp * 1.15,
-        budget_utilization_pct: 87.0,
-        health_score: Math.min(78 + Math.round(netDelta / 2000), 96),
-        health_rating: netDelta > 0 ? "Excellent" : "Good"
-      },
-      net_monthly_delta: netDelta,
-      annual_savings_delta: netDelta * 12,
-      health_score_delta: Math.round(netDelta / 2000),
-      budget_utilization_delta_pct: -5.5,
-      goal_impacts: [
-        {
-          goal_title: "MacBook Pro M-Series",
-          target_amount: 80000,
-          current_amount: 23000,
-          remaining_amount: 57000,
-          baseline_months_to_complete: 4,
-          simulated_months_to_complete: netDelta > 0 ? 3 : 4,
-          months_saved: netDelta > 0 ? 1 : 0,
-          accelerated_completion_date: "November 2026"
-        },
-        {
-          goal_title: "Emergency Safety Reserve",
-          target_amount: 300000,
-          current_amount: 180000,
-          remaining_amount: 120000,
-          baseline_months_to_complete: 10,
-          simulated_months_to_complete: netDelta > 0 ? 8 : 10,
-          months_saved: netDelta > 0 ? 2 : 0,
-          accelerated_completion_date: "April 2027"
-        }
-      ],
-      simulated_timeline: Array.from({ length: 24 }, (_, i) => ({
-        month: i + 1,
-        projected_expense: Math.round(exp * Math.pow(1.005, i + 1)),
-        net_monthly_saved: net,
-        cumulative_portfolio: 150000 + net * (i + 1) * 1.05
-      })),
-      projected_net_savings: 150000 + net * 24 * 1.05,
-      runway_impact_months: Math.round(((150000 + net * 24) / exp) * 10) / 10,
-      ai_explanation: `Your simulated scenario unlocks +₹${Math.max(netDelta, 0).toLocaleString()}/month in net surplus (+₹${Math.max(netDelta * 12, 0).toLocaleString()} additional annual savings), boosting your overall savings rate to ${(Math.round((net / inc) * 1000) / 10)}%. Financial Health Score is projected to increase by +${Math.max(Math.round(netDelta / 2000), 0)} points.`,
-      guru_critique: {
-        buffett: `Disciplined compounding of your surplus will multiply your financial runway significantly.`,
-        kiyosaki: `Redirecting your net monthly boost into cash-flowing assets lowers your earned wage dependency.`,
-        sethi: `Automate the extra monthly transfer directly into your goal accounts on payday.`
-      }
-    };
+    return requestJson<SimulationResult>(`/analytics/simulation`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   },
 
   async getSubscriptionsDashboard(): Promise<SubscriptionDashboardData> {
-    try {
-      const res = await fetch(`${API_BASE}/subscriptions/`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return {
-      total_monthly_recurring: 3478.0,
-      total_annual_recurring: 41736.0,
-      active_subscriptions_count: 5,
-      pending_detection_count: 1,
-      subscriptions_by_type: {
-        monthly_subscription: 828.0,
-        annual_subscription: 124.9,
-        recurring_bill: 825.0,
-        recurring_membership: 1750.0
-      },
-      subscriptions: [
-        { id: "s1", service_name: "Netflix Premium", merchant_name: "Netflix", recurring_type: "monthly_subscription", amount: 649, billing_cycle: "monthly", annualized_cost: 7788, confidence: 0.95, status: "confirmed", last_paid_date: "2026-08-10", next_billing_date: "2026-09-10", category_name: "Subscriptions", is_active: true },
-        { id: "s2", service_name: "Spotify Family", merchant_name: "Spotify", recurring_type: "monthly_subscription", amount: 179, billing_cycle: "monthly", annualized_cost: 2148, confidence: 0.95, status: "confirmed", last_paid_date: "2026-08-20", next_billing_date: "2026-09-20", category_name: "Subscriptions", is_active: true },
-        { id: "s3", service_name: "Amazon Prime Annual", merchant_name: "Amazon", recurring_type: "annual_subscription", amount: 1499, billing_cycle: "yearly", annualized_cost: 1499, confidence: 0.95, status: "confirmed", last_paid_date: "2026-01-15", next_billing_date: "2027-01-15", category_name: "Subscriptions", is_active: true },
-        { id: "s4", service_name: "Jio Fiber Broadband", merchant_name: "Reliance Jio", recurring_type: "recurring_bill", amount: 825, billing_cycle: "monthly", annualized_cost: 9900, confidence: 0.95, status: "confirmed", last_paid_date: "2026-08-05", next_billing_date: "2026-09-05", category_name: "Bills", is_active: true },
-        { id: "s5", service_name: "Cult.fit Elite Membership", merchant_name: "Cult.fit", recurring_type: "recurring_membership", amount: 1750, billing_cycle: "monthly", annualized_cost: 21000, confidence: 0.92, status: "detected", last_paid_date: "2026-08-15", next_billing_date: "2026-09-15", category_name: "Healthcare", is_active: true }
-      ]
-    };
+    return requestJson<SubscriptionDashboardData>(`/subscriptions/`);
   },
 
   async scanSubscriptions(): Promise<SubscriptionDashboardData> {
-    try {
-      const res = await fetch(`${API_BASE}/subscriptions/scan`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return this.getSubscriptionsDashboard();
+    return requestJson<SubscriptionDashboardData>(`/subscriptions/scan`, { method: "POST" });
   },
 
   async confirmSubscription(id: string): Promise<SubscriptionItem> {
@@ -1214,10 +831,11 @@ export const api = {
   },
 
   async deleteSubscription(id: string): Promise<void> {
-    await fetch(`${API_BASE}/subscriptions/${id}`, {
+    const res = await fetch(`${API_BASE}/subscriptions/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
+    if (!res.ok) throw new Error("Failed to delete subscription");
   },
 
   async getMonthlyReport(month?: string): Promise<MonthlyReportData> {
@@ -1230,9 +848,26 @@ export const api = {
   },
 
   getMonthlyReportPdfUrl(month?: string): string {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("finsight_token") : null;
     const m = month || "2026-08";
     return `${API_BASE}/reports/monthly/pdf?month=${m}&token=${token || ""}`;
+  },
+
+  async downloadStatementPdf(): Promise<void> {
+    const token = typeof window !== "undefined" ? localStorage.getItem("finsight_token") : null;
+    const res = await fetch(`${API_BASE}/reports/export/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) throw new Error("Failed to export PDF statement");
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `FinSight_Statement_${new Date().toISOString().split("T")[0]}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   },
 
   async comparePhilosophies(question: string, dimension?: string, philosophies?: string[]): Promise<PhilosophyComparisonResponse> {

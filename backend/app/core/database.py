@@ -2,6 +2,7 @@ import uuid
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.pool import NullPool
 from backend.app.core.config import settings
 
 # Engine configuration
@@ -9,7 +10,7 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     echo=False,
     future=True,
-    # SQLite specific args if using sqlite
+    poolclass=NullPool if "postgresql" in settings.DATABASE_URL else None,
     connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
 )
 

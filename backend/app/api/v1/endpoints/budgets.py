@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from backend.app.core.database import get_db
 from backend.app.models.user import User
 from backend.app.models.budget import Budget
+from backend.app.models.category import Category
 from backend.app.models.transaction import Transaction
 from backend.app.schemas.budget import (
     BudgetCreate,
@@ -183,14 +184,39 @@ async def create_or_update_budget(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    cat_id = budget_in.category_id
+    if not cat_id and budget_in.category_name:
+        c_res = await db.execute(
+            select(Category).filter(
+                (Category.user_id == current_user.id) | (Category.user_id == None) | (Category.is_custom == False),
+                Category.name.ilike(budget_in.category_name.strip())
+            )
+        )
+        cat = c_res.scalars().first()
+        if cat:
+            cat_id = cat.id
+        else:
+            new_cat = Category(
+                user_id=current_user.id,
+                name=budget_in.category_name.strip(),
+                group_type="Need",
+                icon="Tag",
+                color="#6366F1",
+                is_custom=True
+            )
+            db.add(new_cat)
+            await db.flush()
+            cat_id = new_cat.id
+
+    threshold = budget_in.alert_threshold_percentage or int(budget_in.warning_threshold_pct or 80)
     res = await db.execute(
-        select(Budget).filter(Budget.user_id == current_user.id, Budget.category_id == budget_in.category_id)
+        select(Budget).filter(Budget.user_id == current_user.id, Budget.category_id == cat_id)
     )
     existing_budget = res.scalars().first()
 
     if existing_budget:
         existing_budget.total_limit = Decimal(str(budget_in.monthly_limit))
-        existing_budget.alert_threshold_percentage = budget_in.alert_threshold_percentage or 80
+        existing_budget.alert_threshold_percentage = threshold
         existing_budget.period = budget_in.period or "monthly"
         db.add(existing_budget)
         await db.commit()
@@ -198,10 +224,10 @@ async def create_or_update_budget(
     else:
         new_budget = Budget(
             user_id=current_user.id,
-            category_id=budget_in.category_id,
+            category_id=cat_id,
             total_limit=Decimal(str(budget_in.monthly_limit)),
             period=budget_in.period or "monthly",
-            alert_threshold_percentage=budget_in.alert_threshold_percentage or 80
+            alert_threshold_percentage=threshold
         )
         db.add(new_budget)
         await db.commit()

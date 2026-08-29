@@ -2,33 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #090D16;
-  --foreground: #F8FAFC;
+@layer base {
+  :root {
+    /* UI/UX Pro Max design system — "Trust & Authority", Minimalism/Swiss */
+    --color-primary: #F59E0B;      /* trust gold */
+    --color-on-primary: #0F172A;
+    --color-secondary: #FBBF24;
+    --color-accent: #8B5CF6;       /* tech purple — solid CTA accent only, never a gradient */
+    --background: #0F172A;
+    --surface: #222735;            /* card */
+    --surface-elevated: #272F42;   /* muted */
+    --border: #334155;
+    --foreground: #F8FAFC;
+    --muted: #94A3B8;
+    --destructive: #EF4444;
+    --ring: #F59E0B;
+
+    /* Font aliases so components can reference display/body/sans interchangeably */
+    --font-display: var(--font-sans);
+    --font-body: var(--font-sans);
+  }
+
+  body {
+    color: var(--foreground);
+    background-color: var(--background);
+    font-family: var(--font-sans), 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "tnum";
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  overflow-x: hidden;
-}
-
-/* Custom scrollbar for fintech dark UI */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #0F172A;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #334155;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #475569;
 }

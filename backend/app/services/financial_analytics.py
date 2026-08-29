@@ -54,6 +54,7 @@ class FinancialAnalyticsEngine:
     ) -> FinancialSummary:
         """
         Calculates total income, total expenses, net savings, savings rate, and average daily spend.
+        Uses database SQL pushdown aggregation for high throughput scale.
         """
         if not end_date:
             end_date = date.today()
@@ -62,26 +63,23 @@ class FinancialAnalyticsEngine:
 
         days_in_period = max(1, (end_date - start_date).days + 1)
 
-        # Query all active transactions in window
-        query = select(Transaction).filter(
+        from sqlalchemy import case, func
+        query = select(
+            func.count(Transaction.id).label("tx_count"),
+            func.coalesce(func.sum(case((Transaction.transaction_type == "credit", Transaction.amount), else_=0)), 0).label("income"),
+            func.coalesce(func.sum(case((Transaction.transaction_type == "debit", Transaction.amount), else_=0)), 0).label("expense")
+        ).filter(
             Transaction.user_id == user_id,
             Transaction.is_deleted == False,
             Transaction.transaction_date >= start_date,
             Transaction.transaction_date <= end_date
         )
         res = await db.execute(query)
-        txs = res.scalars().all()
+        row = res.one()
 
-        income_dec = Decimal("0.00")
-        expense_dec = Decimal("0.00")
-        tx_count = len(txs)
-
-        for t in txs:
-            amt = self._to_decimal(t.amount)
-            if t.transaction_type == "credit":
-                income_dec += amt
-            elif t.transaction_type == "debit":
-                expense_dec += amt
+        tx_count = row.tx_count or 0
+        income_dec = self._to_decimal(row.income)
+        expense_dec = self._to_decimal(row.expense)
 
         net_savings_dec = income_dec - expense_dec
         
@@ -164,8 +162,18 @@ class FinancialAnalyticsEngine:
     ) -> List[CategorySpending]:
         """
         Calculates spending grouped by category with percentages and transaction counts.
+        Uses SQL GROUP BY pushdown.
         """
-        query = select(Transaction).options(selectinload(Transaction.category)).filter(
+        query = select(
+            Category.id.label("category_id"),
+            func.coalesce(Category.name, "Other").label("category_name"),
+            func.coalesce(Category.group_type, "Want").label("group_type"),
+            func.coalesce(Category.color, "#6366F1").label("color"),
+            func.coalesce(func.sum(Transaction.amount), 0).label("total_amount"),
+            func.count(Transaction.id).label("transaction_count")
+        ).outerjoin(
+            Category, Transaction.category_id == Category.id
+        ).filter(
             Transaction.user_id == user_id,
             Transaction.is_deleted == False,
             Transaction.transaction_type == "debit"
@@ -175,48 +183,28 @@ class FinancialAnalyticsEngine:
         if end_date:
             query = query.filter(Transaction.transaction_date <= end_date)
 
-        res = await db.execute(query)
-        txs = res.scalars().all()
+        query = query.group_by(Category.id, Category.name, Category.group_type, Category.color).order_by(func.sum(Transaction.amount).desc())
 
-        if not txs:
+        res = await db.execute(query)
+        rows = res.all()
+
+        if not rows:
             return []
 
-        cat_map: Dict[str, Dict[str, Any]] = {}
-        total_exp_dec = Decimal("0.00")
-
-        for t in txs:
-            amt = self._to_decimal(t.amount)
-            total_exp_dec += amt
-
-            cat_name = t.category.name if t.category else "Other"
-            cat_id = t.category_id
-            group_type = t.category.group_type if t.category else "Want"
-            color = t.category.color if (t.category and t.category.color) else "#6366F1"
-
-            if cat_name not in cat_map:
-                cat_map[cat_name] = {
-                    "category_id": cat_id,
-                    "category_name": cat_name,
-                    "group_type": group_type,
-                    "total_amount_dec": Decimal("0.00"),
-                    "transaction_count": 0,
-                    "color": color
-                }
-            cat_map[cat_name]["total_amount_dec"] += amt
-            cat_map[cat_name]["transaction_count"] += 1
+        total_exp_dec = sum((self._to_decimal(r.total_amount) for r in rows), Decimal("0.00"))
 
         results = []
-        for name, data in cat_map.items():
-            amt_dec = data["total_amount_dec"]
+        for r in rows:
+            amt_dec = self._to_decimal(r.total_amount)
             pct = ((amt_dec / total_exp_dec) * Decimal("100.00")) if total_exp_dec > 0 else Decimal("0.00")
             results.append(CategorySpending(
-                category_id=data["category_id"],
-                category_name=name,
-                group_type=data["group_type"],
+                category_id=r.category_id,
+                category_name=r.category_name,
+                group_type=r.group_type,
                 total_amount=self._to_float(amt_dec),
                 percentage_of_total=round(self._to_float(pct), 2),
-                transaction_count=data["transaction_count"],
-                color=data["color"]
+                transaction_count=r.transaction_count,
+                color=r.color
             ))
 
         return sorted(results, key=lambda x: x.total_amount, reverse=True)
@@ -280,9 +268,14 @@ class FinancialAnalyticsEngine:
         limit: int = 5
     ) -> List[TopMerchantSpending]:
         """
-        Calculates largest merchants by spending volume.
+        Calculates largest merchants by spending volume using SQL GROUP BY pushdown.
         """
-        query = select(Transaction).filter(
+        merchant_expr = func.coalesce(Transaction.merchant_name, Transaction.description)
+        query = select(
+            merchant_expr.label("m_name"),
+            func.coalesce(func.sum(Transaction.amount), 0).label("total_amount"),
+            func.count(Transaction.id).label("tx_count")
+        ).filter(
             Transaction.user_id == user_id,
             Transaction.is_deleted == False,
             Transaction.transaction_type == "debit"
@@ -292,38 +285,40 @@ class FinancialAnalyticsEngine:
         if end_date:
             query = query.filter(Transaction.transaction_date <= end_date)
 
-        res = await db.execute(query)
-        txs = res.scalars().all()
+        query = query.group_by(merchant_expr).order_by(func.sum(Transaction.amount).desc()).limit(limit)
 
-        if not txs:
+        res = await db.execute(query)
+        rows = res.all()
+
+        if not rows:
             return []
 
-        merchant_map: Dict[str, Dict[str, Any]] = {}
-        total_exp_dec = Decimal("0.00")
+        # Get total debit expense in period for percentage calculation
+        total_exp_query = select(func.coalesce(func.sum(Transaction.amount), 0)).filter(
+            Transaction.user_id == user_id,
+            Transaction.is_deleted == False,
+            Transaction.transaction_type == "debit"
+        )
+        if start_date:
+            total_exp_query = total_exp_query.filter(Transaction.transaction_date >= start_date)
+        if end_date:
+            total_exp_query = total_exp_query.filter(Transaction.transaction_date <= end_date)
 
-        for t in txs:
-            amt = self._to_decimal(t.amount)
-            total_exp_dec += amt
-            m_name = (t.merchant_name or t.description or "Unknown Merchant").strip()
-
-            if m_name not in merchant_map:
-                merchant_map[m_name] = {"total_amount_dec": Decimal("0.00"), "count": 0}
-            merchant_map[m_name]["total_amount_dec"] += amt
-            merchant_map[m_name]["count"] += 1
+        total_exp_res = await db.execute(total_exp_query)
+        total_exp_dec = self._to_decimal(total_exp_res.scalar_one_or_none())
 
         results = []
-        for name, data in merchant_map.items():
-            amt_dec = data["total_amount_dec"]
+        for r in rows:
+            amt_dec = self._to_decimal(r.total_amount)
             pct = ((amt_dec / total_exp_dec) * Decimal("100.00")) if total_exp_dec > 0 else Decimal("0.00")
             results.append(TopMerchantSpending(
-                merchant_name=name,
+                merchant_name=r.m_name,
                 total_amount=self._to_float(amt_dec),
-                transaction_count=data["count"],
+                transaction_count=r.tx_count,
                 percentage_of_expenses=round(self._to_float(pct), 2)
             ))
 
-        results.sort(key=lambda x: x.total_amount, reverse=True)
-        return results[:limit]
+        return results
 
     async def calculate_budget_utilization(
         self,
@@ -381,7 +376,13 @@ class FinancialAnalyticsEngine:
         """
         Calculates monthly cash flow trends with income, expense, and savings rate.
         """
-        query = select(Transaction).filter(
+        from sqlalchemy import case, func
+        # Filter transactions
+        query = select(
+            Transaction.transaction_date,
+            Transaction.transaction_type,
+            Transaction.amount
+        ).filter(
             Transaction.user_id == user_id,
             Transaction.is_deleted == False
         )
@@ -391,18 +392,18 @@ class FinancialAnalyticsEngine:
             query = query.filter(Transaction.transaction_date <= end_date)
 
         res = await db.execute(query)
-        txs = res.scalars().all()
+        rows = res.all()
 
         month_map: Dict[str, Dict[str, Decimal]] = {}
-        for t in txs:
-            m_key = t.transaction_date.strftime("%b %Y")
+        for r_date, r_type, r_amt in rows:
+            m_key = r_date.strftime("%b %Y")
             if m_key not in month_map:
                 month_map[m_key] = {"income": Decimal("0.00"), "expense": Decimal("0.00")}
             
-            amt = self._to_decimal(t.amount)
-            if t.transaction_type == "credit":
+            amt = self._to_decimal(r_amt)
+            if r_type == "credit":
                 month_map[m_key]["income"] += amt
-            elif t.transaction_type == "debit":
+            elif r_type == "debit":
                 month_map[m_key]["expense"] += amt
 
         trends = []
@@ -476,5 +477,24 @@ class FinancialAnalyticsEngine:
             budget_utilization=budget_util,
             recurring_expenses=recurring_items
         )
+
+    async def get_monthly_summary(
+        self,
+        db: AsyncSession,
+        user_id: str,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        currency: str = "INR"
+    ) -> FinancialSummary:
+        return await self.calculate_summary(db=db, user_id=user_id, start_date=start_date, end_date=end_date, currency=currency)
+
+    async def get_spending_by_category(
+        self,
+        db: AsyncSession,
+        user_id: str,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
+    ) -> List[CategorySpending]:
+        return await self.calculate_category_spending(db=db, user_id=user_id, start_date=start_date, end_date=end_date)
 
 financial_analytics_engine = FinancialAnalyticsEngine()

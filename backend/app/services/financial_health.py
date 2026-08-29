@@ -71,16 +71,16 @@ class FinancialHealthEngine:
         txs = t_res.scalars().all()
 
         # Aggregate Debits & Credits
-        total_income_30 = sum(t.amount for t in txs if t.transaction_type == "credit")
+        total_income_30 = sum(float(t.amount) for t in txs if t.transaction_type == "credit")
         if total_income_30 > 0:
             monthly_income = total_income_30 # Use actual credited income if present
 
-        total_expenses_30 = sum(t.amount for t in txs if t.transaction_type == "debit")
-        emi_expenses_30 = sum(t.amount for t in txs if t.transaction_type == "debit" and (
+        total_expenses_30 = sum(float(t.amount) for t in txs if t.transaction_type == "debit")
+        emi_expenses_30 = sum(float(t.amount) for t in txs if t.transaction_type == "debit" and (
             (t.category and t.category.name.lower() in ["emi", "loan"]) or
             ("emi" in t.description.lower() or "loan" in t.description.lower())
         ))
-        recurring_expenses_30 = sum(t.amount for t in txs if t.transaction_type == "debit" and (
+        recurring_expenses_30 = sum(float(t.amount) for t in txs if t.transaction_type == "debit" and (
             t.is_subscription or (t.category and t.category.name.lower() in ["subscriptions", "bills"])
         ))
 
@@ -212,7 +212,7 @@ class FinancialHealthEngine:
             if t.transaction_type == "debit":
                 days_ago = (today - t.transaction_date).days
                 w_idx = min(3, max(0, days_ago // 7))
-                weekly_spends[w_idx] += t.amount
+                weekly_spends[w_idx] += float(t.amount)
 
         mean_weekly = sum(weekly_spends) / 4.0 if sum(weekly_spends) > 0 else 1.0
         variance = sum((w - mean_weekly) ** 2 for w in weekly_spends) / 4.0
@@ -480,5 +480,8 @@ class FinancialHealthEngine:
             "debt_and_burn_score": burn_score,
             "insights": [f"Savings rate: {savings_rate:.1f}%", f"Rating: {rating}"]
         }
+
+    async def calculate_composite_health_score(self, db: AsyncSession, user_id: str):
+        return await self.compute_health_score(db=db, user_id=user_id, persist=False)
 
 financial_health_engine = FinancialHealthEngine()

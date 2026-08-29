@@ -154,19 +154,16 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <FileText className="w-6 h-6 text-blue-400" />
-            Financial Document & Bank Statement Ingestion
-          </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Statement & Document Ingestion</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             Multi-source ingestion for Indian bank statements (HDFC, SBI, ICICI, Axis), UPI exports (PhonePe, GPay, Paytm), and receipt PDFs with duplicate detection.
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <span className="text-xs text-emerald-400 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <ShieldCheck className="w-4 h-4" /> INR & UPI Normalization Active
+          <span className="text-xs text-emerald-400 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" /> Normalization Active
           </span>
         </div>
       </div>
@@ -186,15 +183,15 @@ export default function DocumentsPage() {
       )}
 
       {/* Ingestion Upload Card */}
-      <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-5 shadow-xl">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-5 shadow-xl">
         {/* Upload Mode Selector */}
         <div className="flex items-center space-x-2 border-b border-[#1E293B] pb-4">
           <button
             onClick={() => setUploadMode('statement')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               uploadMode === 'statement'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                : 'text-slate-400 hover:text-slate-200 bg-[#11192C]'
+                ? 'bg-amber-500 text-[#0F172A] shadow-lg shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200 bg-[#222735]'
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -204,8 +201,8 @@ export default function DocumentsPage() {
             onClick={() => setUploadMode('receipt')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               uploadMode === 'receipt'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                : 'text-slate-400 hover:text-slate-200 bg-[#11192C]'
+                ? 'bg-amber-500 text-[#0F172A] shadow-lg shadow-amber-500/20'
+                : 'text-slate-400 hover:text-slate-200 bg-[#222735]'
             }`}
           >
             <Receipt className="w-4 h-4" />
@@ -216,7 +213,7 @@ export default function DocumentsPage() {
         {/* Drag and Drop Zone */}
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-[#1E293B] hover:border-blue-500/50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-[#11192C]/40 hover:bg-[#11192C]/70 transition-all group"
+          className="border-2 border-dashed border-[#1E293B] hover:border-amber-500/50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-[#222735]/40 hover:bg-[#222735]/70 transition-all group"
         >
           <input
             ref={fileInputRef}
@@ -226,13 +223,13 @@ export default function DocumentsPage() {
             className="hidden"
           />
 
-          <div className="p-4 rounded-2xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform mb-3">
+          <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform mb-3">
             <UploadCloud className="w-8 h-8" />
           </div>
 
           <h3 className="text-slate-200 font-bold text-sm">
             {isProcessing ? (
-              <span className="flex items-center gap-2 text-blue-400">
+              <span className="flex items-center gap-2 text-amber-400">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 {processingStage}
               </span>
@@ -248,35 +245,35 @@ export default function DocumentsPage() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] text-slate-400 font-medium">
-            <span className="px-2.5 py-1 rounded-md bg-[#151D30] border border-[#1E293B]">HDFC / SBI / ICICI Adapters</span>
-            <span className="px-2.5 py-1 rounded-md bg-[#151D30] border border-[#1E293B]">PhonePe & GPay UPI Parser</span>
-            <span className="px-2.5 py-1 rounded-md bg-[#151D30] border border-[#1E293B]">Duplicate Detection</span>
-            <span className="px-2.5 py-1 rounded-md bg-[#151D30] border border-[#1E293B]">Balance Integrity Check</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">HDFC / SBI / ICICI Adapters</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">PhonePe & GPay UPI Parser</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">Duplicate Detection</span>
+            <span className="px-2.5 py-1 rounded-md bg-[#272F42] border border-[#1E293B]">Balance Integrity Check</span>
           </div>
         </div>
       </div>
 
       {/* Candidate Verification Drawer / Modal */}
       {activeIngestion && (
-        <div className="p-6 rounded-2xl bg-[#0D1322] border-2 border-blue-500/40 space-y-5 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border-2 border-amber-500/40 space-y-5 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1E293B] pb-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-blue-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" /> Extracted Candidates Awaiting User Confirmation
                 </span>
                 {accountSummary?.bank_adapter && (
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono">
                     {accountSummary.bank_adapter}
                   </span>
                 )}
               </div>
               <h2 className="text-lg font-bold text-white mt-0.5">
-                Review & Edit Transactions from <span className="text-blue-300 font-mono text-sm">{activeIngestion.filename}</span>
+                Review & Edit Transactions from <span className="text-amber-300 font-mono text-sm">{activeIngestion.filename}</span>
               </h2>
             </div>
             <div className="flex items-center space-x-3">
-              <span className="text-xs px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
+              <span className="text-xs px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
                 Avg Confidence: {Math.round(activeIngestion.confidence_avg * 100)}%
               </span>
               <button
@@ -319,7 +316,7 @@ export default function DocumentsPage() {
           {/* Editable Candidate Rows */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#11192C] text-slate-400 uppercase font-semibold border-b border-[#1E293B]">
+              <thead className="bg-[#222735] text-slate-400 uppercase font-semibold border-b border-[#1E293B]">
                 <tr>
                   <th className="px-3 py-3">Description *</th>
                   <th className="px-3 py-3">Merchant / Payee</th>
@@ -335,13 +332,13 @@ export default function DocumentsPage() {
               </thead>
               <tbody className="divide-y divide-[#1E293B]">
                 {candidateList.map((cand, idx) => (
-                  <tr key={cand.id || idx} className={`hover:bg-[#11192C]/40 ${cand.is_duplicate ? 'bg-amber-500/5' : ''}`}>
+                  <tr key={cand.id || idx} className={`hover:bg-[#222735]/40 ${cand.is_duplicate ? 'bg-amber-500/5' : ''}`}>
                     <td className="px-3 py-2.5">
                       <input
                         type="text"
                         value={cand.description}
                         onChange={(e) => updateCandidateField(idx, 'description', e.target.value)}
-                        className="w-full p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="w-full p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       />
                     </td>
                     <td className="px-3 py-2.5">
@@ -350,7 +347,7 @@ export default function DocumentsPage() {
                         value={cand.merchant_name || ''}
                         placeholder="Merchant name"
                         onChange={(e) => updateCandidateField(idx, 'merchant_name', e.target.value)}
-                        className="w-full p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="w-full p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       />
                     </td>
                     <td className="px-3 py-2.5">
@@ -359,14 +356,14 @@ export default function DocumentsPage() {
                         step="0.01"
                         value={cand.amount}
                         onChange={(e) => updateCandidateField(idx, 'amount', parseFloat(e.target.value) || 0)}
-                        className="w-24 p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 font-semibold focus:outline-none focus:border-blue-500"
+                        className="w-24 p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 font-semibold focus:outline-none focus:border-amber-500"
                       />
                     </td>
                     <td className="px-3 py-2.5">
                       <select
                         value={cand.transaction_type}
                         onChange={(e) => updateCandidateField(idx, 'transaction_type', e.target.value)}
-                        className="p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       >
                         <option value="debit">Debit</option>
                         <option value="credit">Credit</option>
@@ -376,7 +373,7 @@ export default function DocumentsPage() {
                       <select
                         value={cand.category_suggestion || ''}
                         onChange={(e) => updateCandidateField(idx, 'category_suggestion', e.target.value)}
-                        className="p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       >
                         <option value="">General</option>
                         {categories.map((c) => (
@@ -389,14 +386,14 @@ export default function DocumentsPage() {
                         type="date"
                         value={cand.transaction_date}
                         onChange={(e) => updateCandidateField(idx, 'transaction_date', e.target.value)}
-                        className="p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       />
                     </td>
                     <td className="px-3 py-2.5">
                       <select
                         value={cand.payment_method || 'UPI'}
                         onChange={(e) => updateCandidateField(idx, 'payment_method', e.target.value)}
-                        className="p-1.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="p-1.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                       >
                         <option value="UPI">UPI</option>
                         <option value="Credit Card">Credit Card</option>
@@ -452,7 +449,7 @@ export default function DocumentsPage() {
             <div className="flex space-x-3">
               <button
                 onClick={() => setActiveIngestion(null)}
-                className="px-4 py-2 rounded-xl bg-[#151D30] hover:bg-[#1E293B] text-slate-300 font-semibold text-xs transition-colors"
+                className="px-4 py-2 rounded-xl bg-[#272F42] hover:bg-[#1E293B] text-slate-300 font-semibold text-xs transition-colors"
               >
                 Cancel
               </button>
@@ -470,8 +467,8 @@ export default function DocumentsPage() {
       )}
 
       {/* Ingested Documents History Ledger */}
-      <div className="rounded-2xl bg-[#0D1322] border border-[#1E293B] overflow-hidden shadow-lg">
-        <div className="p-4 bg-[#11192C] border-b border-[#1E293B] flex items-center justify-between">
+      <div className="rounded-2xl bg-[#0F172A] border border-[#1E293B] overflow-hidden shadow-lg">
+        <div className="p-4 bg-[#222735] border-b border-[#1E293B] flex items-center justify-between">
           <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
             Document Ingestion Log & Ingested Files
           </span>
@@ -486,7 +483,7 @@ export default function DocumentsPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-slate-400 text-xs uppercase font-semibold border-b border-[#1E293B] bg-[#11192C]/50">
+            <thead className="text-slate-400 text-xs uppercase font-semibold border-b border-[#1E293B] bg-[#222735]/50">
               <tr>
                 <th className="px-6 py-4">Filename</th>
                 <th className="px-6 py-4">Type</th>
@@ -511,9 +508,9 @@ export default function DocumentsPage() {
                 </tr>
               ) : (
                 documents.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-[#11192C]/50 transition-colors">
+                  <tr key={doc.id} className="hover:bg-[#222735]/50 transition-colors">
                     <td className="px-6 py-4 font-semibold text-slate-200 flex items-center space-x-2.5">
-                      <FileText className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <FileText className="w-4 h-4 text-amber-400 flex-shrink-0" />
                       <span className="truncate max-w-xs">{doc.filename}</span>
                     </td>
                     <td className="px-6 py-4 text-slate-400 text-xs capitalize">
@@ -529,7 +526,7 @@ export default function DocumentsPage() {
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                             : doc.processing_status === 'pending_verification'
                             ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                         }`}
                       >
                         {doc.processing_status === 'confirmed' ? (

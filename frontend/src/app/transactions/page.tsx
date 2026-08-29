@@ -247,29 +247,26 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Receipt className="w-6 h-6 text-blue-400" />
-            Core Transaction Management
-          </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Manage, filter, edit, and audit financial transactions with database-level pagination.
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Transaction Ledger</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Complete financial record with multi-source ingestion, intelligent categorization, and deterministic audit trail.
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={fetchTransactions}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#151D30] hover:bg-[#1E293B] text-slate-300 text-xs font-semibold border border-[#1E293B] transition-all"
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-[#222735] hover:bg-[#272F42] text-slate-300 text-xs font-medium border border-[#1E293B] transition-all"
             title="Refresh transactions"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <span className="hidden sm:inline">Refresh</span>
           </button>
           <button
             onClick={openCreateModal}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all"
+            className="flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-semibold shadow-xs transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Record Transaction</span>
@@ -277,10 +274,10 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      <div className="p-4 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-3">
+      <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
             <input
               type="text"
               placeholder="Search description, merchant or notes..."
@@ -289,11 +286,11 @@ export default function TransactionsPage() {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-10 pr-4 py-2 bg-[#11192C] border border-[#1E293B] rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 bg-[#0F172A] border border-[#1E293B] rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
             />
           </div>
 
-          <div className="flex items-center space-x-1.5 bg-[#11192C] p-1 rounded-xl border border-[#1E293B]">
+          <div className="flex items-center space-x-1 bg-[#0F172A] p-1 rounded-lg border border-[#1E293B]">
             {['all', 'debit', 'credit'].map((type) => (
               <button
                 key={type}
@@ -301,23 +298,23 @@ export default function TransactionsPage() {
                   setFilterType(type);
                   setCurrentPage(1);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${
                   filterType === type
-                    ? 'bg-blue-600 text-white shadow'
+                    ? 'bg-amber-500 text-[#0F172A]'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {type === 'all' ? 'All Types' : type}
+                {type === 'all' ? 'All' : type === 'debit' ? 'Outflow' : 'Inflow'}
               </button>
             ))}
           </div>
 
           <button
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
               showAdvancedFilters || selectedCategory || startDate || minAmount
-                ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                : 'bg-[#11192C] border-[#1E293B] text-slate-400 hover:text-slate-200'
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                : 'bg-[#0F172A] border-[#1E293B] text-slate-400 hover:text-slate-200'
             }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -335,7 +332,7 @@ export default function TransactionsPage() {
                   setSelectedCategory(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500 transition-colors"
               >
                 <option value="">All Categories</option>
                 {categories.map((c) => (
@@ -352,7 +349,7 @@ export default function TransactionsPage() {
                   setPaymentMethodFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               >
                 <option value="all">All Methods</option>
                 <option value="UPI">UPI</option>
@@ -371,7 +368,7 @@ export default function TransactionsPage() {
                   setSourceFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               >
                 <option value="all">All Sources</option>
                 <option value="manual">Manual Entry</option>
@@ -387,7 +384,7 @@ export default function TransactionsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="flex-1 p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="flex-1 p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
                 >
                   <option value="transaction_date">Date</option>
                   <option value="amount">Amount</option>
@@ -396,7 +393,7 @@ export default function TransactionsPage() {
                 </select>
                 <button
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="px-2.5 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-300 hover:text-white"
+                  className="px-2.5 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-300 hover:text-white"
                   title="Toggle Ascending/Descending"
                 >
                   <ArrowUpDown className="w-3.5 h-3.5" />
@@ -413,7 +410,7 @@ export default function TransactionsPage() {
                   setStartDate(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -426,7 +423,7 @@ export default function TransactionsPage() {
                   setEndDate(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -440,7 +437,7 @@ export default function TransactionsPage() {
                   setMinAmount(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -454,7 +451,7 @@ export default function TransactionsPage() {
                   setMaxAmount(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full p-2 bg-[#11192C] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-2 bg-[#222735] border border-[#1E293B] rounded-lg text-slate-200 focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -470,56 +467,56 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      <div className="rounded-2xl bg-[#0D1322] border border-[#1E293B] overflow-hidden shadow-lg">
+      <div className="rounded-xl bg-[#222735] border border-[#1E293B] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#11192C] text-slate-400 text-xs uppercase font-semibold border-b border-[#1E293B]">
+            <thead className="bg-[#0F172A] text-slate-400 text-xs uppercase font-semibold border-b border-[#1E293B]">
               <tr>
-                <th className="px-6 py-4">Transaction / Merchant</th>
-                <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Payment Method</th>
-                <th className="px-6 py-4 text-right">Amount</th>
-                <th className="px-6 py-4 text-center">Actions</th>
+                <th className="px-5 py-3.5">Transaction / Merchant</th>
+                <th className="px-5 py-3.5">Category</th>
+                <th className="px-5 py-3.5">Date</th>
+                <th className="px-5 py-3.5">Method</th>
+                <th className="px-5 py-3.5 text-right">Amount</th>
+                <th className="px-5 py-3.5 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#1E293B]">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                    <div className="inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                    <div>Loading transactions from database...</div>
+                  <td colSpan={6} className="px-6 py-16 text-center">
+                    <div className="inline-block w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <div className="text-slate-400 text-sm">Loading ledger from database...</div>
                   </td>
                 </tr>
               ) : paginatedData.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                    <Info className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                    <div className="text-slate-300 font-semibold">No transactions found</div>
-                    <div className="text-xs text-slate-500 mt-1">Try adjusting your search criteria or record a new transaction.</div>
+                  <td colSpan={6} className="px-6 py-16 text-center">
+                    <Receipt className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                    <div className="text-slate-300 font-semibold text-sm">No transactions found</div>
+                    <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Adjust your filters, upload a bank statement, or record a transaction manually.</div>
                   </td>
                 </tr>
               ) : (
                 paginatedData.items.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-[#11192C]/60 transition-colors group">
-                    <td className="px-6 py-4">
+                  <tr key={tx.id} className="hover:bg-[#272F42]/40 transition-colors group">
+                    <td className="px-5 py-3.5">
                       <div className="flex items-center space-x-3">
                         <div
-                          className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                           style={{
-                            backgroundColor: `${tx.category?.color || '#3B82F6'}20`,
-                            color: tx.category?.color || '#3B82F6',
+                            backgroundColor: `${tx.category?.color || '#F59E0B'}18`,
+                            color: tx.category?.color || '#F59E0B',
                           }}
                         >
-                          <Receipt className="w-4 h-4" />
+                          <Receipt className="w-3.5 h-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <div className="font-semibold text-slate-200 truncate">{tx.description}</div>
-                          <div className="text-[11px] text-slate-400 flex items-center gap-2">
+                          <div className="font-medium text-slate-200 truncate text-sm">{tx.description}</div>
+                          <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
                             {tx.merchant_name && <span>{tx.merchant_name}</span>}
-                            {tx.subcategory && <span className="text-slate-500">• {tx.subcategory}</span>}
+                            {tx.subcategory && <span className="text-slate-500">· {tx.subcategory}</span>}
                             {tx.is_subscription && (
-                              <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px]">
+                              <span className="px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px] font-medium">
                                 Recurring
                               </span>
                             )}
@@ -527,29 +524,27 @@ export default function TransactionsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-5 py-3.5">
                       <span
-                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold"
+                        className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border"
                         style={{
-                          backgroundColor: `${tx.category?.color || '#6366F1'}15`,
-                          color: tx.category?.color || '#6366F1',
+                          backgroundColor: `${tx.category?.color || '#8B5CF6'}12`,
+                          color: tx.category?.color || '#8B5CF6',
+                          borderColor: `${tx.category?.color || '#8B5CF6'}30`,
                         }}
                       >
                         {tx.category?.name || 'General'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-400 text-xs">
+                    <td className="px-5 py-3.5 text-slate-400 text-xs tabular-nums">
                       {formatDate(tx.transaction_date)}
                     </td>
-                    <td className="px-6 py-4 text-slate-300 text-xs">
-                      <span className="inline-flex items-center gap-1.5">
-                        <CreditCard className="w-3.5 h-3.5 text-slate-500" />
-                        {tx.payment_method || 'UPI'}
-                      </span>
+                    <td className="px-5 py-3.5 text-slate-400 text-xs font-mono">
+                      {tx.payment_method || 'UPI'}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-5 py-3.5 text-right">
                       <span
-                        className={`font-bold ${
+                        className={`font-semibold tabular-nums text-sm ${
                           tx.transaction_type === 'credit' ? 'text-emerald-400' : 'text-slate-100'
                         }`}
                       >
@@ -561,7 +556,7 @@ export default function TransactionsPage() {
                       <div className="flex items-center justify-center space-x-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openDetailsModal(tx)}
-                          className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
@@ -589,7 +584,7 @@ export default function TransactionsPage() {
           </table>
         </div>
 
-        <div className="px-6 py-4 bg-[#11192C] border-t border-[#1E293B] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        <div className="px-6 py-4 bg-[#222735] border-t border-[#1E293B] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div className="flex items-center space-x-4">
             <span>
               Showing <span className="font-semibold text-slate-200">{paginatedData.items.length}</span> of{' '}
@@ -603,7 +598,7 @@ export default function TransactionsPage() {
                   setPageSize(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="bg-[#0D1322] border border-[#1E293B] rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-blue-500"
+                className="bg-[#0F172A] border border-[#1E293B] rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-amber-500"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
@@ -616,7 +611,7 @@ export default function TransactionsPage() {
             <button
               disabled={currentPage <= 1 || loading}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="p-1.5 rounded-lg bg-[#0D1322] border border-[#1E293B] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg bg-[#0F172A] border border-[#1E293B] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -626,7 +621,7 @@ export default function TransactionsPage() {
             <button
               disabled={currentPage >= paginatedData.total_pages || loading}
               onClick={() => setCurrentPage((p) => p + 1)}
-              className="p-1.5 rounded-lg bg-[#0D1322] border border-[#1E293B] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg bg-[#0F172A] border border-[#1E293B] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -636,10 +631,10 @@ export default function TransactionsPage() {
 
       {(isCreateModalOpen || isEditModalOpen) && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-blue-400" />
+                <Receipt className="w-5 h-5 text-amber-400" />
                 {isEditModalOpen ? 'Edit Transaction' : 'Record New Transaction'}
               </h3>
               <button
@@ -668,7 +663,7 @@ export default function TransactionsPage() {
                   placeholder="e.g. Swiggy Lunch, Grocery Shopping"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                 />
               </div>
 
@@ -680,7 +675,7 @@ export default function TransactionsPage() {
                     placeholder="e.g. Starbucks, Amazon"
                     value={formData.merchant_name}
                     onChange={(e) => setFormData({ ...formData, merchant_name: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
                 <div>
@@ -690,7 +685,7 @@ export default function TransactionsPage() {
                     placeholder="e.g. Coffee, Office Supplies"
                     value={formData.subcategory}
                     onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -705,7 +700,7 @@ export default function TransactionsPage() {
                     placeholder="0.00"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
                 <div>
@@ -713,7 +708,7 @@ export default function TransactionsPage() {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -729,7 +724,7 @@ export default function TransactionsPage() {
                   <select
                     value={formData.transaction_type}
                     onChange={(e) => setFormData({ ...formData, transaction_type: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   >
                     <option value="debit">Expense (Debit)</option>
                     <option value="credit">Income (Credit)</option>
@@ -741,7 +736,7 @@ export default function TransactionsPage() {
                   <select
                     value={formData.category_id}
                     onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   >
                     <option value="">Auto-Detect / General</option>
                     {categories.map((c) => (
@@ -757,7 +752,7 @@ export default function TransactionsPage() {
                   <select
                     value={formData.payment_method}
                     onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   >
                     <option value="UPI">UPI</option>
                     <option value="Credit Card">Credit Card</option>
@@ -772,7 +767,7 @@ export default function TransactionsPage() {
                     type="date"
                     value={formData.transaction_date}
                     onChange={(e) => setFormData({ ...formData, transaction_date: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -784,14 +779,14 @@ export default function TransactionsPage() {
                   placeholder="Optional notes or context..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500 resize-none"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-100 focus:outline-none focus:border-amber-500 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={formSubmitting}
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] font-semibold shadow-lg shadow-amber-500/25 transition-all disabled:opacity-50"
               >
                 {formSubmitting
                   ? 'Saving...'
@@ -806,10 +801,10 @@ export default function TransactionsPage() {
 
       {isDetailsModalOpen && selectedTx && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
               <div>
-                <span className="text-xs text-blue-400 font-bold uppercase tracking-wider">Transaction Details</span>
+                <span className="text-xs text-amber-400 font-bold uppercase tracking-wider">Transaction Details</span>
                 <h3 className="font-bold text-white text-lg">{selectedTx.description}</h3>
               </div>
               <button
@@ -821,7 +816,7 @@ export default function TransactionsPage() {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="flex justify-between items-center p-3 rounded-xl bg-[#11192C] border border-[#1E293B]">
+              <div className="flex justify-between items-center p-3 rounded-xl bg-[#222735] border border-[#1E293B]">
                 <span className="text-slate-400">Total Amount:</span>
                 <span
                   className={`text-base font-bold ${
@@ -834,34 +829,34 @@ export default function TransactionsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-slate-300">
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Category</span>
                   <span className="font-semibold text-slate-200">{selectedTx.category?.name || 'General'}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Subcategory</span>
                   <span className="font-semibold text-slate-200">{selectedTx.subcategory || 'None'}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Merchant / Payee</span>
                   <span className="font-semibold text-slate-200">{selectedTx.merchant_name || 'N/A'}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Payment Mode</span>
                   <span className="font-semibold text-slate-200">{selectedTx.payment_method || 'UPI'}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Date</span>
                   <span className="font-semibold text-slate-200">{formatDate(selectedTx.transaction_date)}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block">Source</span>
                   <span className="font-semibold text-slate-200 capitalize">{selectedTx.source || 'manual'}</span>
                 </div>
               </div>
 
               {selectedTx.confidence_score !== undefined && (
-                <div className="p-2.5 rounded-lg bg-[#11192C] flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-[#222735] flex items-center justify-between">
                   <span className="text-slate-400">Confidence Score:</span>
                   <span className="font-semibold text-emerald-400">
                     {Math.round((selectedTx.confidence_score || 1) * 100)}%
@@ -870,7 +865,7 @@ export default function TransactionsPage() {
               )}
 
               {selectedTx.notes && (
-                <div className="p-2.5 rounded-lg bg-[#11192C]">
+                <div className="p-2.5 rounded-lg bg-[#222735]">
                   <span className="text-[10px] text-slate-500 block mb-1">Notes</span>
                   <p className="text-slate-300 italic">{selectedTx.notes}</p>
                 </div>
@@ -887,7 +882,7 @@ export default function TransactionsPage() {
                   setIsDetailsModalOpen(false);
                   openEditModal(selectedTx);
                 }}
-                className="flex-1 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors"
+                className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] font-semibold text-xs transition-colors"
               >
                 Edit Transaction
               </button>

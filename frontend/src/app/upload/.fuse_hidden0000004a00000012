@@ -1,0 +1,378 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  UploadCloud,
+  FileText,
+  Receipt,
+  FileSpreadsheet,
+  CheckCircle2,
+  AlertTriangle,
+  Sparkles,
+  ShieldCheck,
+  ArrowRight,
+  RefreshCw,
+  Edit2,
+  Trash2,
+  X,
+  Check
+} from 'lucide-react';
+import {
+  api,
+  FinancialDocument,
+  CandidateTransaction,
+  Category,
+  DocumentIngestionResponse
+} from '@/lib/api';
+import { formatCurrency, formatDate } from '@/lib/utils';
+
+export default function UploadPage() {
+  const [documents, setDocuments] = useState<FinancialDocument[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Ingestion States
+  const [uploadMode, setUploadMode] = useState<'statement' | 'receipt'>('statement');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStage, setProcessingStage] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Candidate Review State
+  const [activeIngestion, setActiveIngestion] = useState<DocumentIngestionResponse | null>(null);
+  const [candidateList, setCandidateList] = useState<CandidateTransaction[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [docs, cats] = await Promise.all([
+        api.getDocuments(),
+        api.getCategories()
+      ]);
+      setDocuments(docs || []);
+      setCategories(cats || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+    setUploadError('');
+    setSuccessMessage('');
+    setProcessingStage('Pre-processing image and scanning ledger patterns...');
+
+    try {
+      let res: DocumentIngestionResponse;
+      if (uploadMode === 'receipt') {
+        setProcessingStage('Extracting receipt OCR bounding boxes and merchant data...');
+        res = await api.uploadReceipt(file);
+      } else {
+        setProcessingStage('Parsing bank statement balance integrity and UPI narratives...');
+        res = await api.uploadBankStatement(file);
+      }
+
+      setActiveIngestion(res);
+      setCandidateList(res.candidates || []);
+      setSuccessMessage(`Document scanned: ${res.candidates?.length || 0} candidate transactions extracted for review.`);
+      loadData();
+    } catch (err: any) {
+      setUploadError(err.message || 'Ingestion failed. Please check file format.');
+    } finally {
+      setIsProcessing(false);
+      setProcessingStage('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCandidateChange = (index: number, field: keyof CandidateTransaction, value: any) => {
+    const updated = [...candidateList];
+    updated[index] = { ...updated[index], [field]: value };
+    setCandidateList(updated);
+  };
+
+  const handleRemoveCandidate = (index: number) => {
+    setCandidateList(candidateList.filter((_, i) => i !== index));
+  };
+
+  const handleConfirmAndCommit = async () => {
+    if (!activeIngestion) return;
+    setIsConfirming(true);
+    try {
+      await api.confirmCandidateTransactions(activeIngestion.document_id, candidateList);
+      setSuccessMessage(`Successfully committed ${candidateList.length} transactions into verified ledger!`);
+      setActiveIngestion(null);
+      setCandidateList([]);
+      loadData();
+    } catch (err: any) {
+      setUploadError(err.message || 'Commit failed');
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Document Ingestion & OCR Pipeline</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Upload bank statements, UPI exports, or receipts. Our OCR pipeline extracts, categorizes, and commits transactions with your review.
+          </p>
+        </div>
+
+        {/* Upload Mode Switcher */}
+        <div className="flex items-center space-x-1 p-1 rounded-lg bg-[#0F172A] border border-[#1E293B] text-xs">
+          <button
+            onClick={() => setUploadMode('statement')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              uploadMode === 'statement'
+                ? 'bg-amber-500 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Bank Statement</span>
+          </button>
+          <button
+            onClick={() => setUploadMode('receipt')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              uploadMode === 'receipt'
+                ? 'bg-amber-500 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Receipt className="w-3.5 h-3.5" />
+            <span>Receipt / OCR</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Multi-Step Pipeline Indicator */}
+      <div className="grid grid-cols-5 gap-2 p-3 rounded-xl bg-[#0F172A] border border-[#1E293B] text-center text-xs">
+        <div className={`p-2 rounded-lg border transition-all ${!isProcessing && !activeIngestion ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 1</span>
+          <span>1. Upload</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${isProcessing && processingStage.includes('Reading') ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 2</span>
+          <span>2. Processing</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${isProcessing && processingStage.includes('merchant') ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 3</span>
+          <span>3. Extraction</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${activeIngestion && candidateList.length > 0 ? 'bg-amber-600/10 border-amber-500/30 text-amber-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 4</span>
+          <span>4. Verification</span>
+        </div>
+        <div className={`p-2 rounded-lg border transition-all ${successMessage.includes('committed') ? 'bg-emerald-600/10 border-emerald-500/30 text-emerald-400 font-semibold' : 'border-transparent text-slate-400'}`}>
+          <span className="block text-[10px] uppercase font-bold text-slate-400">Step 5</span>
+          <span>5. Confirmation</span>
+        </div>
+      </div>
+
+      {/* Upload Dropzone */}
+      <div className="p-8 rounded-xl bg-[#222735] border-2 border-dashed border-[#1E293B] hover:border-amber-500/50 transition-all text-center space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={uploadMode === 'receipt' ? '.png,.jpg,.jpeg,.pdf' : '.csv,.pdf,.xlsx'}
+          onChange={handleFileUpload}
+          className="hidden"
+          id="file-upload"
+        />
+
+        <label htmlFor="file-upload" className="cursor-pointer block space-y-3">
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
+            <UploadCloud className="w-6 h-6" />
+          </div>
+
+          <div>
+            <span className="font-semibold text-white text-sm">
+              Click to upload or drag & drop your {uploadMode === 'statement' ? 'Bank Statement' : 'Receipt / Bill'}
+            </span>
+            <p className="text-slate-400 text-xs mt-1">
+              Supports HDFC, SBI, ICICI, PhonePe, Google Pay, Razorpay receipts & multi-page statements.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-center space-x-2 text-[11px] text-emerald-400 font-medium pt-1">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>PII Scrubber Active: Account numbers and cards masked automatically</span>
+          </div>
+        </label>
+
+        {isProcessing && (
+          <div className="p-3.5 rounded-lg bg-[#0F172A] border border-[#1E293B] flex items-center justify-center space-x-2.5 text-xs text-amber-400">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span>{processingStage}</span>
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+            {uploadError}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+            {successMessage}
+          </div>
+        )}
+      </div>
+
+      {/* Candidate Transactions Review Stage */}
+      {activeIngestion && candidateList.length > 0 && (
+        <div className="p-5 rounded-xl bg-[#222735] border border-amber-500/30 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
+            <div>
+              <h2 className="font-semibold text-white text-sm">Review Candidate Transactions ({candidateList.length})</h2>
+              <p className="text-slate-400 text-xs mt-0.5">Edit values if needed before committing into the permanent ledger.</p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setActiveIngestion(null)}
+                className="px-3 py-1.5 rounded-lg bg-[#0F172A] hover:bg-[#272F42] border border-[#1E293B] text-slate-400 text-xs font-medium transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAndCommit}
+                disabled={isConfirming}
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-all"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>{isConfirming ? 'Committing...' : 'Commit to Ledger'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-[#0F172A] text-slate-400 uppercase text-[10px]">
+                <tr>
+                  <th className="p-2.5 rounded-l-lg font-semibold">Date</th>
+                  <th className="p-2.5 font-semibold">Description</th>
+                  <th className="p-2.5 font-semibold">Type</th>
+                  <th className="p-2.5 font-semibold">Category</th>
+                  <th className="p-2.5 font-semibold">Amount (₹)</th>
+                  <th className="p-2.5 text-right rounded-r-lg font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1E293B]">
+                {candidateList.map((c, idx) => (
+                  <tr key={idx} className="hover:bg-[#272F42]/40">
+                    <td className="p-2">
+                      <input
+                        type="date"
+                        value={c.transaction_date ? String(c.transaction_date).split('T')[0] : ''}
+                        onChange={(e) => handleCandidateChange(idx, 'transaction_date', e.target.value)}
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={c.description}
+                        onChange={(e) => handleCandidateChange(idx, 'description', e.target.value)}
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs w-48"
+                      />
+                    </td>
+                    <td className="p-2">
+                      <select
+                        value={c.transaction_type}
+                        onChange={(e) => handleCandidateChange(idx, 'transaction_type', e.target.value)}
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
+                      >
+                        <option value="debit">Debit</option>
+                        <option value="credit">Credit</option>
+                      </select>
+                    </td>
+                    <td className="p-2">
+                      <select
+                        value={c.category_suggestion || ''}
+                        onChange={(e) => handleCandidateChange(idx, 'category_suggestion', e.target.value)}
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs"
+                      >
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.name}>{cat.name}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        value={c.amount}
+                        onChange={(e) => handleCandidateChange(idx, 'amount', parseFloat(e.target.value) || 0)}
+                        className="bg-[#0F172A] border border-[#1E293B] rounded-lg p-1 text-slate-200 text-xs w-24 font-semibold tabular-nums"
+                      />
+                    </td>
+                    <td className="p-2 text-right">
+                      <button
+                        onClick={() => handleRemoveCandidate(idx)}
+                        className="p-1 rounded text-slate-400 hover:text-rose-400 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Uploaded Documents History */}
+      <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-3">
+        <div className="flex items-center justify-between border-b border-[#1E293B] pb-2">
+          <h2 className="font-semibold text-white text-sm">Processed Statements & Receipts</h2>
+          <span className="text-[11px] text-slate-400">{documents.length} documents</span>
+        </div>
+        {documents.length === 0 ? (
+          <div className="py-6 text-center">
+            <FileText className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+            <p className="text-xs text-slate-400">No documents ingested yet. Upload your first statement or receipt above.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[#1E293B]">
+            {documents.map((doc) => (
+              <div key={doc.id} className="py-3 flex items-center justify-between text-xs">
+                <div className="flex items-center space-x-3">
+                  <div className="p-1.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
+                    <FileText className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
+                  <div>
+                    <span className="font-medium text-white">{doc.filename}</span>
+                    <div className="text-slate-400 text-[10px] mt-0.5">
+                      {doc.file_type?.toUpperCase()} · {formatDate(doc.created_at)}
+                    </div>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
+                  {doc.processing_status?.toUpperCase() || 'PROCESSED'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

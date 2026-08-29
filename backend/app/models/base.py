@@ -7,7 +7,7 @@ def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 def get_utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 class UUIDMixin:
     id = Column(String(36), primary_key=True, default=generate_uuid, index=True)

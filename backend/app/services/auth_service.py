@@ -1,3 +1,5 @@
+import os
+import logging
 from decimal import Decimal
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +11,7 @@ from backend.app.models.user import User, Profile
 from backend.app.models.category import Category
 from backend.app.models.audit_log import AuditLog
 from backend.app.schemas.auth import (
-    UserRegister, UserLogin, Token, UserUpdate, UserPreferences, LogoutResponse, PrivacyDeletionResponse
+    UserRegister, UserLogin, GoogleOAuthRequest, Token, UserUpdate, UserPreferences, LogoutResponse, PrivacyDeletionResponse
 )
 from backend.app.repositories.user_repo import user_repository
 
@@ -127,6 +129,89 @@ class AuthService:
             full_name=full_name
         )
 
+    async def authenticate_google_user(self, db: AsyncSession, google_in: GoogleOAuthRequest) -> Token:
+        import secrets
+        email = str(google_in.email or "google.user@finsight.ai")
+        full_name = google_in.full_name or email.split("@")[0].replace(".", " ").title()
+
+        res = await db.execute(
+            select(User).options(selectinload(User.profile)).filter(User.email == email)
+        )
+        user = res.scalars().first()
+
+        if not user:
+            # Register new verified Google OAuth user
+            random_pwd = secrets.token_urlsafe(18)[:24]
+            user = User(
+                email=email,
+                hashed_password=get_password_hash(random_pwd),
+                is_active=True,
+                is_verified=True
+            )
+            db.add(user)
+            await db.flush()
+
+            # New users start from zero: no assumed income. The user sets this
+            # themselves in onboarding/settings once they have a real figure.
+            profile = Profile(
+                user_id=user.id,
+                full_name=full_name,
+                preferred_currency="INR",
+                preferred_guru="balanced",
+                monthly_income=Decimal("0.00"),
+                country_code="IN"
+            )
+            db.add(profile)
+
+            # Seed initial categories
+            for cat in DEFAULT_CATEGORIES:
+                category = Category(
+                    user_id=user.id,
+                    name=cat["name"],
+                    group_type=cat["group_type"],
+                    icon=cat["icon"],
+                    color=cat["color"],
+                    is_custom=False
+                )
+                db.add(category)
+
+            audit = AuditLog(
+                user_id=user.id,
+                action="google_oauth_registered",
+                entity_type="User",
+                entity_id=user.id,
+                details={"email": user.email, "provider": "google"}
+            )
+            db.add(audit)
+            await db.commit()
+            await db.refresh(user)
+        else:
+            if user.is_deleted:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Account has been deactivated or deleted",
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+            audit = AuditLog(
+                user_id=user.id,
+                action="google_oauth_login",
+                entity_type="User",
+                entity_id=user.id,
+                details={"email": user.email, "provider": "google"}
+            )
+            db.add(audit)
+            await db.commit()
+
+        token = create_access_token(user.id)
+        name = user.profile.full_name if user.profile else full_name
+        return Token(
+            access_token=token,
+            token_type="bearer",
+            user_id=user.id,
+            email=user.email,
+            full_name=name
+        )
+
     async def logout_user(self, db: AsyncSession, token: str, user: User) -> LogoutResponse:
         revoke_token(token)
         audit = AuditLog(
@@ -205,8 +290,8 @@ class AuthService:
             if doc.storage_path and os.path.exists(doc.storage_path):
                 try:
                     os.remove(doc.storage_path)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logging.getLogger(__name__).warning(f"Failed to delete document file {doc.storage_path}: {e}")
 
         # Remove user cascades
         await db.delete(user)

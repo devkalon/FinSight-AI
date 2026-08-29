@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -34,7 +35,7 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    group: 'Management',
+    group: 'Ledger & Operations',
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard },
       { name: 'Transactions', href: '/transactions', icon: Receipt },
@@ -45,7 +46,7 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
-    group: 'Analytics & Models',
+    group: 'Predictive & Strategy',
     items: [
       { name: 'Analytics', href: '/analytics', icon: TrendingUp },
       { name: 'Forecast', href: '/forecast', icon: LineChart, badge: 'ML' },
@@ -53,9 +54,9 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
-    group: 'Intelligence & Reports',
+    group: 'Intelligence & Audit',
     items: [
-      { name: 'Insights & Health', href: '/insights', icon: Sparkles },
+      { name: 'Health & Insights', href: '/insights', icon: Sparkles },
       { name: 'AI Advisor', href: '/advisor', icon: Bot, badge: 'Agent' },
       { name: 'Philosophies', href: '/philosophies', icon: Scale },
       { name: 'Monthly Report', href: '/reports', icon: FileText, badge: 'PDF' },
@@ -63,77 +64,99 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
-    group: 'Account',
+    group: 'Configuration',
     items: [
-      { name: 'Settings & Privacy', href: '/settings', icon: Settings },
+      { name: 'Settings & Security', href: '/settings', icon: Settings },
     ]
   }
 ];
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-[#0A0E1A] border-r border-[#1D263B] flex flex-col h-screen fixed left-0 top-0 z-40">
-      {/* Brand Header */}
-      <div className="p-5 border-b border-[#1D263B] flex items-center space-x-3">
-        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/30">
-          <Zap className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <h1 className="font-bold text-base text-white tracking-tight">FinSight <span className="text-blue-400">AI</span></h1>
-          <p className="text-[11px] text-slate-400 font-medium">Wealth Intelligence</p>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 lg:hidden"
+        />
+      )}
 
-      {/* Navigation Links */}
-      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto custom-scrollbar">
-        {navGroups.map((group, gIdx) => (
-          <div key={gIdx} className="space-y-1">
-            <div className="px-3 pb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              {group.group}
+      <aside
+        className={`w-64 bg-[#0B1120] border-r border-[#1E293B] flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Brand Header */}
+        <div className="h-16 px-5 border-b border-[#1E293B] flex items-center justify-between">
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/logo.png"
+              alt="FinSight AI"
+              width={140}
+              height={38}
+              className="object-contain"
+              priority
+            />
+          </Link>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto custom-scrollbar">
+          {navGroups.map((group, gIdx) => (
+            <div key={gIdx} className="space-y-0.5">
+              <div className="px-3 pb-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                {group.group}
+              </div>
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || (item.href === '/' && pathname === '/dashboard');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                      isActive
+                        ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold'
+                        : 'text-slate-300 hover:text-white hover:bg-[#1E293B] border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span
+                        className={`text-[9px] px-1.5 py-0.2 rounded font-semibold tracking-wide ${
+                          isActive
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                            : 'bg-[#272F42] text-slate-300 border border-[#1E293B]'
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
-            {group.items.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href === '/' && pathname === '/dashboard');
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-[#12192B]'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span>{item.name}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[#182238] text-slate-300 border border-[#23304E]'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
-      </nav>
+          ))}
+        </nav>
 
-      {/* Footer Security Badge */}
-      <div className="p-3 m-3 rounded-xl bg-[#0F1626] border border-[#1D263B]">
-        <div className="flex items-center space-x-1.5 text-emerald-400 text-[11px] font-bold mb-0.5">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Deterministic Audit Guarantee</span>
+        {/* Footer Security Badge */}
+        <div className="p-3 m-3 rounded-lg bg-[#222735] border border-[#1E293B]">
+          <div className="flex items-center space-x-1.5 text-emerald-400 text-[11px] font-semibold mb-0.5">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Deterministic Math Guard</span>
+          </div>
+          <p className="text-[10px] text-slate-400 leading-tight">
+            Zero LLM financial hallucinations. Scoped tenant isolation.
+          </p>
         </div>
-        <p className="text-[10px] text-slate-400 leading-tight">
-          Financial numbers computed by verifiable backend algorithms.
-        </p>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

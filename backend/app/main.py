@@ -20,11 +20,11 @@ _RATE_LIMIT_STORE: Dict[str, list] = defaultdict(list)
 def clear_rate_limit_store():
     _RATE_LIMIT_STORE.clear()
 RATE_LIMIT_RULES = {
-    "/auth/login": (15, 60),      # 15 requests per 60s
-    "/auth/register": (10, 60),   # 10 requests per 60s
-    "/upload": (30, 60),          # 30 requests per 60s
-    "/advisor/chat": (60, 60),    # 60 requests per 60s
-    "default": (300, 60)          # 300 requests per 60s
+    "/auth/login": (60, 60),       # 60 requests per 60s
+    "/auth/register": (30, 60),    # 30 requests per 60s
+    "/upload": (60, 60),           # 60 requests per 60s
+    "/advisor/chat": (120, 60),    # 120 requests per 60s
+    "default": (300, 60)           # 300 requests per 60s
 }
 
 @asynccontextmanager
@@ -42,20 +42,28 @@ app = FastAPI(
 # SEC-08: Security Headers Middleware
 @app.middleware("http")
 async def add_security_headers_middleware(request: Request, call_next):
-    # SEC-03: Simple IP Rate Limiting Check
+    # Exempt CORS OPTIONS preflight from rate limiting
+    if request.method == "OPTIONS":
+        response = await call_next(request)
+        return response
+
+    # SEC-03: Endpoint-specific IP Rate Limiting
     client_ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
     path = request.url.path
     
     # Determine rule limit and window
+    matched_prefix = "default"
     limit, window = RATE_LIMIT_RULES["default"]
     for prefix, rule in RATE_LIMIT_RULES.items():
         if prefix != "default" and prefix in path:
+            matched_prefix = prefix
             limit, window = rule
             break
 
+    rate_key = f"{client_ip}:{matched_prefix}"
     now = time.time()
-    timestamps = [ts for ts in _RATE_LIMIT_STORE[client_ip] if now - ts < window]
-    _RATE_LIMIT_STORE[client_ip] = timestamps
+    timestamps = [ts for ts in _RATE_LIMIT_STORE[rate_key] if now - ts < window]
+    _RATE_LIMIT_STORE[rate_key] = timestamps
 
     if len(timestamps) >= limit:
         return JSONResponse(
@@ -63,7 +71,7 @@ async def add_security_headers_middleware(request: Request, call_next):
             content={"detail": "Rate limit exceeded. Please slow down your requests.", "retry_after_seconds": window}
         )
     
-    _RATE_LIMIT_STORE[client_ip].append(now)
+    _RATE_LIMIT_STORE[rate_key].append(now)
 
     response: Response = await call_next(request)
     

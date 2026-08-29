@@ -1,22 +1,26 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union, Optional, Set
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 from backend.app.core.config import settings
-
+import bcrypt
 import threading
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Thread-safe revoked tokens store (with Redis fallback hooks for multi-worker production clusters)
 _REVOKED_TOKENS: Set[str] = set()
 _REVOKED_LOCK = threading.Lock()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        pw_bytes = plain_password.encode('utf-8')[:72]
+        hash_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(pw_bytes, hash_bytes)
+    except Exception:
+        return False
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    pw_bytes = password.encode('utf-8')[:72]
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(pw_bytes, salt).decode('utf-8')
 
 def create_access_token(subject: Union[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     if expires_delta:

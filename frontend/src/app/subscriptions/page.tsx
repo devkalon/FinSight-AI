@@ -215,7 +215,7 @@ export default function SubscriptionsPage() {
   });
 
   const getTypeIcon = (type?: string) => {
-    if (type === 'monthly_subscription') return <Tv className="w-4 h-4 text-blue-400" />;
+    if (type === 'monthly_subscription') return <Tv className="w-4 h-4 text-amber-400" />;
     if (type === 'annual_subscription') return <Sparkles className="w-4 h-4 text-purple-400" />;
     if (type === 'recurring_bill') return <Zap className="w-4 h-4 text-amber-400" />;
     if (type === 'recurring_membership') return <Dumbbell className="w-4 h-4 text-emerald-400" />;
@@ -231,34 +231,34 @@ export default function SubscriptionsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Subscriptions & Recurring Payments</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold text-xs border border-blue-500/20">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Subscriptions & Recurring Payments</h1>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium text-[11px] border border-amber-500/20">
               Auto-Detection Engine
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             Identify recurring monthly & annual subscriptions, utility bills, and memberships with annualized burn calculation
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 self-start sm:self-auto">
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
           <button
             onClick={handleScan}
             disabled={scanning}
-            className="flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-slate-200 text-xs font-semibold transition-all shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-[#222735] hover:bg-[#272F42] border border-[#1E293B] text-slate-200 text-xs font-medium transition-all"
           >
-            <RefreshCcw className={`w-3.5 h-3.5 ${scanning ? 'animate-spin text-blue-400' : 'text-slate-400'}`} />
-            <span>{scanning ? 'Scanning Ledger...' : 'Scan Transactions'}</span>
+            <RefreshCcw className={`w-3.5 h-3.5 ${scanning ? 'animate-spin text-amber-400' : 'text-slate-400'}`} />
+            <span>{scanning ? 'Scanning...' : 'Scan Ledger'}</span>
           </button>
 
           <button
             onClick={openCreateModal}
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all"
+            className="flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-semibold shadow-xs transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add Subscription</span>
@@ -267,57 +267,57 @@ export default function SubscriptionsPage() {
       </div>
 
       {/* KPI Banners (4 Grid) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold">Total Monthly Burn</span>
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
-              <CreditCard className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Monthly Outflow</span>
+            <div className="p-1 rounded-md bg-rose-500/10 text-rose-400">
+              <CreditCard className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-white">
+          <div className="text-xl font-bold text-white tabular-nums">
             {formatCurrency(data?.total_monthly_recurring || 3478)} <span className="text-xs text-slate-500 font-normal">/mo</span>
           </div>
-          <span className="text-[11px] text-slate-400">Fixed recurring commitment</span>
+          <span className="text-[11px] text-slate-400 block">Fixed recurring commitment</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold">Total Annualized Burn</span>
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
-              <Sparkles className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Annualized Burn</span>
+            <div className="p-1 rounded-md bg-purple-500/10 text-purple-400">
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-100">
+          <div className="text-xl font-bold text-slate-100 tabular-nums">
             {formatCurrency(data?.total_annual_recurring || 41736)} <span className="text-xs text-slate-500 font-normal">/yr</span>
           </div>
-          <span className="text-[11px] text-slate-400">Projected 12-month cumulative cost</span>
+          <span className="text-[11px] text-slate-400 block">Projected 12-month cumulative</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold">Active Subscriptions</span>
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
-              <ShieldCheck className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Active Services</span>
+            <div className="p-1 rounded-md bg-amber-500/10 text-amber-400">
+              <ShieldCheck className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-white">
+          <div className="text-xl font-bold text-white tabular-nums">
             {data?.active_subscriptions_count || 5} Services
           </div>
-          <span className="text-[11px] text-slate-400">Recurring payments confirmed</span>
+          <span className="text-[11px] text-slate-400 block">Recurring payments confirmed</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold">Pending Detection</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-              <AlertTriangle className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Pending Review</span>
+            <div className="p-1 rounded-md bg-amber-500/10 text-amber-400">
+              <AlertTriangle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-amber-400">
-            {pendingSubs.length} Needs Review
+          <div className="text-xl font-bold text-amber-400 tabular-nums">
+            {pendingSubs.length} Detected
           </div>
-          <span className="text-[11px] text-slate-400">Unconfirmed pattern matches</span>
+          <span className="text-[11px] text-slate-400 block">Pattern matches to verify</span>
         </div>
       </div>
 
@@ -331,11 +331,11 @@ export default function SubscriptionsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             {pendingSubs.map((ps) => (
-              <div key={ps.id} className="p-3.5 rounded-xl bg-[#0D1322] border border-[#1E293B] flex items-center justify-between">
+              <div key={ps.id} className="p-3.5 rounded-xl bg-[#0F172A] border border-[#1E293B] flex items-center justify-between">
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="font-bold text-white text-sm">{ps.service_name}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       {getTypeName(ps.recurring_type)}
                     </span>
                   </div>
@@ -354,7 +354,7 @@ export default function SubscriptionsPage() {
                   </button>
                   <button
                     onClick={() => ps.id && handleDismiss(ps.id)}
-                    className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-[#11192C] hover:bg-[#1E293B] text-slate-400 hover:text-rose-400 transition-all border border-[#1E293B]"
+                    className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-[#222735] hover:bg-[#1E293B] text-slate-400 hover:text-rose-400 transition-all border border-[#1E293B]"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     <span>Dismiss</span>
@@ -381,8 +381,8 @@ export default function SubscriptionsPage() {
             onClick={() => setFilterType(tab.id)}
             className={`px-3.5 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${
               filterType === tab.id
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'bg-[#0D1322] border border-[#1E293B] text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-[#0F172A] shadow-md shadow-amber-500/20'
+                : 'bg-[#0F172A] border border-[#1E293B] text-slate-400 hover:text-white'
             }`}
           >
             {tab.label}
@@ -400,14 +400,14 @@ export default function SubscriptionsPage() {
           return (
             <div
               key={sub.id}
-              className={`p-5 rounded-2xl bg-[#0D1322] border flex flex-col justify-between space-y-4 transition-all hover:border-slate-700 ${
+              className={`p-5 rounded-2xl bg-[#0F172A] border flex flex-col justify-between space-y-4 transition-all hover:border-slate-700 ${
                 isPending ? 'border-amber-500/40' : isDismissed ? 'opacity-50 border-[#1E293B]' : 'border-[#1E293B]'
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <div className="p-2 rounded-xl bg-[#11192C] border border-[#1E293B]">
+                    <div className="p-2 rounded-xl bg-[#222735] border border-[#1E293B]">
                       {getTypeIcon(sub.recurring_type)}
                     </div>
                     <span className="text-[11px] font-semibold text-slate-400">
@@ -432,13 +432,13 @@ export default function SubscriptionsPage() {
 
                     <button
                       onClick={() => openEditModal(sub)}
-                      className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-[#11192C] transition-colors"
+                      className="p-1 rounded-lg text-slate-500 hover:text-white hover:bg-[#222735] transition-colors"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => sub.id && handleDelete(sub.id)}
-                      className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-[#11192C] transition-colors"
+                      className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-[#222735] transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -479,7 +479,7 @@ export default function SubscriptionsPage() {
                     </button>
                     <button
                       onClick={() => sub.id && handleDismiss(sub.id)}
-                      className="flex-1 py-1.5 rounded-lg bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-slate-400 hover:text-rose-400 text-center transition-all"
+                      className="flex-1 py-1.5 rounded-lg bg-[#222735] hover:bg-[#1E293B] border border-[#1E293B] text-slate-400 hover:text-rose-400 text-center transition-all"
                     >
                       Dismiss
                     </button>
@@ -494,7 +494,7 @@ export default function SubscriptionsPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-base">
                 {editingSub ? 'Edit Recurring Payment' : 'Add Recurring Payment'}
@@ -513,7 +513,7 @@ export default function SubscriptionsPage() {
                   placeholder="e.g. Netflix Premium"
                   value={form.service_name}
                   onChange={(e) => setForm({ ...form, service_name: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 />
               </div>
 
@@ -526,7 +526,7 @@ export default function SubscriptionsPage() {
                     placeholder="649"
                     value={form.amount}
                     onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                   />
                 </div>
 
@@ -535,7 +535,7 @@ export default function SubscriptionsPage() {
                   <select
                     value={form.billing_cycle}
                     onChange={(e) => setForm({ ...form, billing_cycle: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                   >
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly (Annual)</option>
@@ -550,7 +550,7 @@ export default function SubscriptionsPage() {
                 <select
                   value={form.recurring_type}
                   onChange={(e) => setForm({ ...form, recurring_type: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 >
                   <option value="monthly_subscription">Monthly Subscription (OTT, Cloud, Apps)</option>
                   <option value="annual_subscription">Annual Subscription (Prime, Licences)</option>
@@ -565,13 +565,13 @@ export default function SubscriptionsPage() {
                   type="date"
                   value={form.next_billing_date}
                   onChange={(e) => setForm({ ...form, next_billing_date: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all"
+                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] font-semibold shadow-lg shadow-amber-500/25 transition-all"
               >
                 {editingSub ? 'Update Subscription' : 'Save Recurring Payment'}
               </button>

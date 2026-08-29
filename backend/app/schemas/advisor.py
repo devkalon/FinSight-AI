@@ -23,9 +23,17 @@ class ChatMessageOut(BaseModel):
     session_id: str
     sender: str
     content: str
+    response: Optional[str] = None
     tool_calls: Optional[List[Dict[str, Any]]] = None
     citations: Optional[List[Dict[str, Any]]] = None
     created_at: datetime
+
+    def __init__(self, **data):
+        if "content" in data and "response" not in data:
+            data["response"] = data["content"]
+        elif "response" in data and "content" not in data:
+            data["content"] = data["response"]
+        super().__init__(**data)
 
     class Config:
         from_attributes = True

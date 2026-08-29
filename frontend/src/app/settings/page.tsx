@@ -48,27 +48,27 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="border-b border-[#1D263B] pb-6">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Platform Settings & Privacy</h1>
-        <p className="text-slate-400 text-xs mt-0.5">
+      <div className="pb-4 border-b border-[#1E293B]">
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Platform Settings & Privacy</h1>
+        <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
           Manage currency standards, default AI advisory personas, tax regimes, and GDPR data rights.
         </p>
       </div>
 
       {savedSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center space-x-2">
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center space-x-2">
           <Check className="w-4 h-4" />
           <span>Preferences updated and persisted across your workspace!</span>
         </div>
       )}
 
       {/* Profile & Account Details */}
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="p-6 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-4">
-          <div className="flex items-center space-x-2 text-white font-bold text-sm border-b border-[#1D263B] pb-3">
-            <User className="w-4 h-4 text-blue-400" />
+      <form onSubmit={handleSave} className="space-y-5">
+        <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-4">
+          <div className="flex items-center space-x-2 text-white font-semibold text-sm border-b border-[#1E293B] pb-3">
+            <User className="w-4 h-4 text-amber-400" />
             <span>Profile & Account Info</span>
           </div>
 
@@ -79,7 +79,7 @@ export default function SettingsPage() {
                 type="text"
                 disabled
                 value={user?.full_name || 'Alex Mercer'}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-300 opacity-80 cursor-not-allowed"
+                className="w-full p-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-300 opacity-80 cursor-not-allowed"
               />
             </div>
 
@@ -89,15 +89,15 @@ export default function SettingsPage() {
                 type="email"
                 disabled
                 value={user?.email || 'alex.mercer@finsight.ai'}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-300 opacity-80 cursor-not-allowed"
+                className="w-full p-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-300 opacity-80 cursor-not-allowed"
               />
             </div>
           </div>
         </div>
 
         {/* Currency & Financial Standards */}
-        <div className="p-6 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-4">
-          <div className="flex items-center space-x-2 text-white font-bold text-sm border-b border-[#1D263B] pb-3">
+        <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-4">
+          <div className="flex items-center space-x-2 text-white font-semibold text-sm border-b border-[#1E293B] pb-3">
             <Globe className="w-4 h-4 text-emerald-400" />
             <span>Currency & Valuation Standard</span>
           </div>
@@ -108,7 +108,7 @@ export default function SettingsPage() {
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-200"
+                className="w-full p-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-200"
               >
                 <option value="INR">INR (₹) — Indian Rupee (Lakhs / Crores standard)</option>
                 <option value="USD">USD ($) — United States Dollar</option>
@@ -122,7 +122,7 @@ export default function SettingsPage() {
               <select
                 value={tax}
                 onChange={(e) => setTax(e.target.value)}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-200"
+                className="w-full p-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-200"
               >
                 <option value="new">New Tax Regime (Lower slab rates, simplified)</option>
                 <option value="old">Old Tax Regime (Section 80C, 80D, HRA deductions)</option>
@@ -132,8 +132,8 @@ export default function SettingsPage() {
         </div>
 
         {/* AI Advisory & Risk Preferences */}
-        <div className="p-6 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-4">
-          <div className="flex items-center space-x-2 text-white font-bold text-sm border-b border-[#1D263B] pb-3">
+        <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-4">
+          <div className="flex items-center space-x-2 text-white font-semibold text-sm border-b border-[#1E293B] pb-3">
             <Bot className="w-4 h-4 text-purple-400" />
             <span>AI Wealth Advisor Preferences</span>
           </div>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
               <select
                 value={guru}
                 onChange={(e) => setGuru(e.target.value)}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-200"
+                className="w-full p-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-slate-200"
               >
                 <option value="balanced">Balanced Consensus Advisor</option>
                 <option value="buffett">Warren Buffett (Value & Indexing)</option>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
               <select
                 value={risk}
                 onChange={(e) => setRisk(e.target.value)}
-                className="w-full p-2.5 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-200"
+                className="w-full p-2.5 bg-[#0B1120] border border-[#272F42] rounded-xl text-slate-200"
               >
                 <option value="conservative">Conservative (Capital preservation, debt, gold)</option>
                 <option value="moderate">Moderate (Balanced equity SIPs & index funds)</option>
@@ -171,7 +171,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition-all"
+            className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-bold shadow-md shadow-amber-500/25 transition-all"
           >
             {loading ? 'Saving...' : 'Save Settings'}
           </button>
@@ -179,8 +179,8 @@ export default function SettingsPage() {
       </form>
 
       {/* GDPR Privacy & Right to be Forgotten */}
-      <div className="p-6 rounded-2xl bg-[#0F1626] border border-rose-500/20 space-y-4">
-        <div className="flex items-center space-x-2 text-rose-400 font-bold text-sm border-b border-[#1D263B] pb-3">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-rose-500/20 space-y-4">
+        <div className="flex items-center space-x-2 text-rose-400 font-bold text-sm border-b border-[#272F42] pb-3">
           <ShieldCheck className="w-4 h-4" />
           <span>Data Privacy & GDPR Right to be Forgotten</span>
         </div>

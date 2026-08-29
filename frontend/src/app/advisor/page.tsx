@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { API_BASE } from '@/lib/api';
 
 interface Message {
   id: string;
@@ -24,11 +25,11 @@ interface Message {
 }
 
 const personas = [
-  { id: 'balanced', name: 'Balanced Wealth Advisor', desc: 'Holistic 50/30/20 & Disciplined Compounding', color: 'from-blue-600 to-indigo-600' },
-  { id: 'buffett', name: 'Warren Buffett', desc: 'Value, Moats & Low-Cost Index Compounding', color: 'from-amber-600 to-orange-600' },
-  { id: 'kiyosaki', name: 'Robert Kiyosaki', desc: 'Cash Flow, Asset Acquisition & Escaping Rat Race', color: 'from-purple-600 to-pink-600' },
-  { id: 'sethi', name: 'Ramit Sethi', desc: 'Conscious Spending Plan & Guilt-Free Wealth Automation', color: 'from-emerald-600 to-teal-600' },
-  { id: 'indian_expert', name: 'Indian Wealth Specialist', desc: 'PPF, ELSS, Mutual Fund SIPs & Term Insurance', color: 'from-sky-600 to-blue-700' }
+  { id: 'balanced', name: 'Balanced Wealth Advisor', desc: 'Holistic 50/30/20 & Disciplined Compounding', color: 'from-amber-500 to-purple-600' },
+  { id: 'buffett', name: 'Warren Buffett', desc: 'Value, Moats & Low-Cost Index Compounding', color: 'from-amber-600 to-amber-400' },
+  { id: 'kiyosaki', name: 'Robert Kiyosaki', desc: 'Cash Flow, Asset Acquisition & Escaping Rat Race', color: 'from-purple-600 to-purple-400' },
+  { id: 'sethi', name: 'Ramit Sethi', desc: 'Conscious Spending Plan & Guilt-Free Wealth Automation', color: 'from-emerald-600 to-emerald-400' },
+  { id: 'indian_expert', name: 'Indian Wealth Specialist', desc: 'PPF, ELSS, Mutual Fund SIPs & Term Insurance', color: 'from-amber-500 to-amber-600' }
 ];
 
 export default function AdvisorPage() {
@@ -69,9 +70,13 @@ export default function AdvisorPage() {
     setIsSending(true);
 
     try {
-      const res = await fetch('/api/v1/advisor/chat', {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('finsight_token') : null;
+      const res = await fetch(`${API_BASE}/advisor/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           message: userText,
           persona: selectedPersona
@@ -94,12 +99,15 @@ export default function AdvisorPage() {
         throw new Error();
       }
     } catch (err) {
-      // Graceful offline mock response
-      let fallbackText = `**${personas.find(p => p.id === selectedPersona)?.name} Perspective**\n\n`;
-      if (userText.toLowerCase().includes('sip') || userText.toLowerCase().includes('compound')) {
-        fallbackText += `📊 **Verified SIP Math Tool Executed:**\nInvesting **₹15,000/month** at **12% CAGR** over **10 years** yields a maturity corpus of **₹34,85,910** (Total Invested: ₹18,00,000 | Returns: ₹16,85,910).\n\nAutomate this transfer on the 1st of every month to eliminate emotional trading.`;
+      // Natural conversational fallback for greeting vs financial advice
+      const cleanInput = userText.toLowerCase().trim();
+      let fallbackText = '';
+      if (['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening'].some(g => cleanInput === g || cleanInput.startsWith(g + ' '))) {
+        fallbackText = `Hello! 👋 How can I help you optimize your personal finances, simulate a loan EMI, calculate SIP growth, or review your budgets today?`;
+      } else if (cleanInput.includes('sip') || cleanInput.includes('compound')) {
+        fallbackText = `📊 **Verified SIP Math Tool Executed:**\nInvesting **₹15,000/month** at **12% CAGR** over **10 years** yields a maturity corpus of **₹34,85,910** (Total Invested: ₹18,00,000 | Returns: ₹16,85,910).\n\nAutomate this transfer on the 1st of every month to eliminate emotional trading.`;
       } else {
-        fallbackText += `Focus on your core financial fundamentals: build a 6-month liquid emergency fund, maintain pure term life insurance, and invest surplus capital systematically into broad-market index funds.`;
+        fallbackText = `**${personas.find(p => p.id === selectedPersona)?.name} Perspective**\n\nFocus on your core financial fundamentals: build a 6-month liquid emergency fund, maintain pure term life insurance, and invest surplus capital systematically into broad-market index funds.`;
       }
       setMessages((prev) => [
         ...prev,
@@ -121,9 +129,13 @@ export default function AdvisorPage() {
     setIsComparing(true);
     const targetDim = dim || selectedDimension;
     try {
-      const res = await fetch('/api/v1/advisor/compare', {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('finsight_token') : null;
+      const res = await fetch(`${API_BASE}/advisor/compare`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           question: compareQuestion,
           dimension: targetDim,
@@ -194,46 +206,46 @@ export default function AdvisorPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">AI Wealth Advisor & Multi-Guru Engine</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Tool-augmented financial advisory, RAG-grounded literature & structured philosophy comparison
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">AI Wealth Advisor</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Tool-augmented advisory engine with RAG-grounded literature, deterministic math tools, and multi-guru philosophy synthesis.
           </p>
         </div>
         <button
           onClick={() => { setIsCompareOpen(true); handleComparePhilosophies(); }}
-          className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/25 transition-all"
+          className="flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-[#272F42] hover:bg-[#1E293B] text-slate-200 text-xs font-semibold border border-[#1E293B] transition-all"
         >
-          <Scale className="w-4 h-4" />
+          <Scale className="w-4 h-4 text-purple-400" />
           <span>Compare Philosophies</span>
         </button>
       </div>
 
-      {/* Persona Switcher Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      {/* Persona Switcher */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
         {personas.map((p) => {
           const isSelected = selectedPersona === p.id;
           return (
             <button
               key={p.id}
               onClick={() => setSelectedPersona(p.id)}
-              className={`p-3.5 rounded-2xl text-left border transition-all relative overflow-hidden ${
+              className={`p-3 rounded-xl text-left border transition-all relative ${
                 isSelected
-                  ? 'bg-[#11192C] border-blue-500/80 shadow-lg shadow-blue-500/10 ring-1 ring-blue-500/30'
-                  : 'bg-[#0D1322] border-[#1E293B] hover:border-slate-700 opacity-75 hover:opacity-100'
+                  ? 'bg-[#222735] border-amber-500/50 ring-1 ring-amber-500/20'
+                  : 'bg-[#222735] border-[#1E293B] hover:border-[#334155] opacity-75 hover:opacity-100'
               }`}
             >
-              <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white mb-2 shadow-md`}>
-                <Sparkles className="w-4 h-4" />
+              <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${p.color} flex items-center justify-center text-white mb-2`}>
+                <Sparkles className="w-3.5 h-3.5" />
               </div>
-              <div className="text-xs font-bold text-white truncate">{p.name}</div>
-              <div className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-snug">{p.desc}</div>
+              <div className="text-xs font-semibold text-white truncate">{p.name}</div>
+              <div className="text-[10px] text-slate-400 mt-0.5 line-clamp-2 leading-snug">{p.desc}</div>
               {isSelected && (
                 <div className="absolute top-2 right-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
                 </div>
               )}
             </button>
@@ -242,30 +254,42 @@ export default function AdvisorPage() {
       </div>
 
       {/* Chat Conversation Box */}
-      <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl flex flex-col h-[560px] shadow-xl">
+      <div className="bg-[#222735] border border-[#1E293B] rounded-xl flex flex-col h-[540px] shadow-xl">
+        {/* Chat Header */}
+        <div className="px-4 py-3 border-b border-[#1E293B] flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${personas.find(p => p.id === selectedPersona)?.color} flex items-center justify-center`}>
+              <Sparkles className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="text-xs font-semibold text-white">{personas.find(p => p.id === selectedPersona)?.name}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium">RAG + Math Tools Active</span>
+        </div>
+
         {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg) => {
             const isUser = msg.sender === 'user';
             return (
               <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-2xl p-4 space-y-2.5 ${
+                <div className={`max-w-[85%] rounded-xl p-3.5 space-y-2 ${
                   isUser
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'bg-[#11192C] border border-[#1E293B] text-slate-200'
+                    ? 'bg-amber-500 text-[#0F172A]'
+                    : 'bg-[#0F172A] border border-[#1E293B] text-slate-200'
                 }`}>
-                  <div className="flex items-center space-x-2 text-[11px] font-semibold text-slate-400">
-                    {isUser ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5 text-blue-400" />}
-                    <span className={isUser ? 'text-blue-200' : 'text-slate-300'}>
+                  <div className="flex items-center space-x-1.5 text-[10px] font-semibold">
+                    {isUser ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3 text-amber-400" />}
+                    <span className={isUser ? 'text-amber-200' : 'text-slate-300'}>
                       {isUser ? 'You' : `${personas.find(p => p.id === selectedPersona)?.name || 'FinSight AI'}`}
                     </span>
                   </div>
 
                   {/* Tool Execution Badges */}
                   {msg.tool_calls && msg.tool_calls.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
+                    <div className="flex flex-wrap gap-1.5">
                       {msg.tool_calls.map((tc, idx) => (
-                        <span key={idx} className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-[#182238] text-[10px] text-blue-400 font-mono border border-blue-500/20">
+                        <span key={idx} className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-[#1E293B] text-[10px] text-amber-400 font-mono border border-amber-500/20">
                           <Calculator className="w-2.5 h-2.5" />
                           <span>{tc.tool_name}</span>
                           {tc.execution_time_sec !== undefined && (
@@ -282,23 +306,21 @@ export default function AdvisorPage() {
 
                   {/* RAG Citations Box */}
                   {msg.citations && msg.citations.length > 0 && (
-                    <div className="pt-2.5 border-t border-[#1E293B] space-y-2">
-                      <div className="flex items-center justify-between text-[11px] text-blue-400 font-semibold">
-                        <div className="flex items-center space-x-1.5">
+                    <div className="pt-2 border-t border-[#1E293B] space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] text-amber-400 font-semibold">
+                        <div className="flex items-center space-x-1">
                           <BookOpen className="w-3 h-3" />
-                          <span>Grounded Source Citations:</span>
+                          <span>Source Citations:</span>
                         </div>
-                        <span className="text-[10px] text-slate-500 font-normal">{msg.citations.length} verified passage(s)</span>
+                        <span className="text-slate-500 font-normal">{msg.citations.length} passage(s)</span>
                       </div>
                       {msg.citations.map((c, i) => (
-                        <div key={i} className="p-2.5 rounded-lg bg-[#0D1322] border border-[#1E293B] text-[11px] space-y-1">
+                        <div key={i} className="p-2 rounded-lg bg-[#272F42] border border-[#1E293B] text-[10px] space-y-1">
                           <div className="text-slate-300 italic leading-relaxed">
-                            "{c.relevant_quote}"
+                            &ldquo;{c.relevant_quote}&rdquo;
                           </div>
-                          <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-[#161F30]">
-                            <span className="font-semibold text-slate-200">
-                              {c.source_title} {c.author ? `— ${c.author}` : ''}
-                            </span>
+                          <div className="text-slate-400 font-medium">
+                            {c.source_title}{c.author ? ` — ${c.author}` : ''}
                           </div>
                         </div>
                       ))}
@@ -310,27 +332,27 @@ export default function AdvisorPage() {
           })}
           {isSending && (
             <div className="flex justify-start">
-              <div className="p-4 rounded-2xl bg-[#11192C] border border-[#1E293B] text-xs text-slate-400 flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <span>Executing financial tools & synthesizing guru advice...</span>
+              <div className="p-3 rounded-xl bg-[#0F172A] border border-[#1E293B] text-xs text-slate-400 flex items-center space-x-2">
+                <div className="w-3.5 h-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Running financial tools & synthesizing response...</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSendMessage} className="p-4 border-t border-[#1E293B] flex items-center space-x-3 bg-[#0D1322] rounded-b-2xl">
+        <form onSubmit={handleSendMessage} className="p-3.5 border-t border-[#1E293B] flex items-center space-x-2.5 bg-[#222735] rounded-b-xl">
           <input
             type="text"
-            placeholder={`Ask ${personas.find(p => p.id === selectedPersona)?.name} (e.g. Calculate SIP for ₹15000/mo, or Should I prepay my home loan?)...`}
+            placeholder={`Ask ${personas.find(p => p.id === selectedPersona)?.name} (e.g. Calculate SIP for ₹15,000/mo, or Should I prepay my home loan?)...`}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            className="flex-1 px-4 py-3 bg-[#11192C] border border-[#1E293B] rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 px-3.5 py-2.5 bg-[#0F172A] border border-[#1E293B] rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
           />
           <button
             type="submit"
             disabled={!inputMessage.trim() || isSending}
-            className="p-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white transition-all shadow-md shadow-blue-500/25"
+            className="p-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-[#0F172A] transition-all"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -340,7 +362,7 @@ export default function AdvisorPage() {
       {/* Structured Philosophy Comparison Modal */}
       {isCompareOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-5xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-5xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[#1E293B] pb-4">
               <div className="flex items-center space-x-3">
@@ -358,8 +380,8 @@ export default function AdvisorPage() {
             </div>
 
             {/* Educational Disclaimer Banner */}
-            <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-[11px] text-blue-300 flex items-center space-x-2.5">
-              <HelpCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
+            <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 flex items-center space-x-2.5">
+              <HelpCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <span>
                 <strong>Educational Interpretation Notice:</strong> Perspectives represent structured interpretations of documented methodologies. No direct personal advice is given.
               </span>
@@ -373,7 +395,7 @@ export default function AdvisorPage() {
                   value={compareQuestion}
                   onChange={(e) => setCompareQuestion(e.target.value)}
                   placeholder="Enter a financial dilemma or question..."
-                  className="flex-1 px-4 py-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-sm text-slate-200 focus:outline-none focus:border-purple-500"
+                  className="flex-1 px-4 py-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-sm text-slate-200 focus:outline-none focus:border-purple-500"
                 />
                 <button
                   onClick={() => handleComparePhilosophies()}
@@ -394,7 +416,7 @@ export default function AdvisorPage() {
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                       selectedDimension === dim
                         ? 'bg-purple-600 text-white shadow-sm'
-                        : 'bg-[#11192C] text-slate-400 hover:text-white border border-[#1E293B]'
+                        : 'bg-[#222735] text-slate-400 hover:text-white border border-[#1E293B]'
                     }`}
                   >
                     {dim.replace('_', ' ').toUpperCase()}
@@ -411,13 +433,13 @@ export default function AdvisorPage() {
                   <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">1. Methodological Perspectives</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {comparisonData.perspectives?.map((p: any) => (
-                      <div key={p.philosophy_id} className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] flex flex-col justify-between space-y-3">
+                      <div key={p.philosophy_id} className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] flex flex-col justify-between space-y-3">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-sm text-white">{p.name}</span>
                           </div>
                           <div className="text-[10px] text-purple-400 font-mono">{p.documented_foundation}</div>
-                          <div className="p-2 rounded-lg bg-[#0D1322] text-[11px] text-slate-300 italic border-l-2 border-purple-500">
+                          <div className="p-2 rounded-lg bg-[#0F172A] text-[11px] text-slate-300 italic border-l-2 border-purple-500">
                             "{p.core_axiom}"
                           </div>
                           <p className="text-xs text-slate-300 leading-relaxed pt-1">{p.perspective}</p>
@@ -441,12 +463,12 @@ export default function AdvisorPage() {
                 {/* 2. Key Differences & Areas of Agreement */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Key Differences */}
-                  <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2.5">
+                  <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2.5">
                     <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
                       <span>Key Methodological Differences</span>
                     </h4>
                     {comparisonData.key_differences?.map((kd: any, i: number) => (
-                      <div key={i} className="text-xs text-slate-300 space-y-1 p-2.5 rounded-lg bg-[#0D1322]">
+                      <div key={i} className="text-xs text-slate-300 space-y-1 p-2.5 rounded-lg bg-[#0F172A]">
                         <span className="font-semibold text-slate-200">{kd.dimension || 'Core Stance'}: </span>
                         <span>{kd.summary}</span>
                       </div>
@@ -454,7 +476,7 @@ export default function AdvisorPage() {
                   </div>
 
                   {/* Areas of Agreement */}
-                  <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2.5">
+                  <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2.5">
                     <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center space-x-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Universal Areas of Agreement</span>
@@ -471,8 +493,8 @@ export default function AdvisorPage() {
                 </div>
 
                 {/* 3. Balanced Strategic Synthesis */}
-                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-indigo-900/30 border border-blue-500/30 space-y-1.5">
-                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Balanced Strategic Synthesis</span>
+                <div className="p-4 rounded-xl bg-[#272F42] border border-amber-500/30 space-y-1.5">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Balanced Strategic Synthesis</span>
                   <p className="text-xs text-slate-200 leading-relaxed">{comparisonData.balanced_synthesis}</p>
                 </div>
               </div>

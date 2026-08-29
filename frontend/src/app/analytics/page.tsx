@@ -153,26 +153,26 @@ export default function AnalyticsPage() {
   const split = dashboard?.spending_split;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header & Date-Range Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Financial Analytics & Intelligence</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Financial Analytics & Intelligence</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             Deterministic decimal-safe ledger calculations, cash flow trends & scenario modeling
           </p>
         </div>
 
         {/* Date Range Selector Bar */}
-        <div className="flex flex-wrap items-center gap-2 bg-[#0D1322] p-1.5 rounded-xl border border-[#1E293B]">
+        <div className="flex flex-wrap items-center gap-1 bg-[#0F172A] p-1 rounded-lg border border-[#1E293B]">
           {DATE_PRESETS.map((p) => (
             <button
               key={p.value}
               onClick={() => handlePresetChange(p.value)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                 preset === p.value
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-[#1E293B]/50'
+                  ? 'bg-amber-500 text-[#0F172A]'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {p.label}
@@ -183,14 +183,14 @@ export default function AnalyticsPage() {
 
       {/* Custom Date Inputs if custom is selected */}
       {preset === 'custom' && (
-        <div className="p-4 rounded-xl bg-[#0D1322] border border-[#1E293B] flex flex-wrap items-center gap-3">
+        <div className="p-4 rounded-xl bg-[#0F172A] border border-[#1E293B] flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400 font-medium">From:</span>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="bg-[#11192C] border border-[#1E293B] rounded-lg px-3 py-1.5 text-xs text-white"
+              className="bg-[#222735] border border-[#1E293B] rounded-lg px-3 py-1.5 text-xs text-white"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -199,12 +199,12 @@ export default function AnalyticsPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="bg-[#11192C] border border-[#1E293B] rounded-lg px-3 py-1.5 text-xs text-white"
+              className="bg-[#222735] border border-[#1E293B] rounded-lg px-3 py-1.5 text-xs text-white"
             />
           </div>
           <button
             onClick={handleCustomApply}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition-colors"
+            className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-semibold transition-colors"
           >
             Apply Filter
           </button>
@@ -212,27 +212,27 @@ export default function AnalyticsPage() {
       )}
 
       {/* 5 Deterministic KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {/* Total Income */}
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Income</span>
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total Inflow</span>
+            <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-400">
+              <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-white mt-2">
+          <div className="text-xl font-bold text-white mt-2 tabular-nums">
             {formatCurrency(summary?.total_income || 0)}
           </div>
           {mom && (
-            <div className="flex items-center gap-1 mt-2 text-xs">
+            <div className="flex items-center gap-1 mt-1 text-[11px]">
               {mom.income_change_pct >= 0 ? (
-                <span className="text-emerald-400 font-semibold flex items-center">
-                  <ArrowUpRight className="w-3.5 h-3.5" /> +{mom.income_change_pct}%
+                <span className="text-emerald-400 font-medium flex items-center">
+                  <ArrowUpRight className="w-3 h-3" /> +{mom.income_change_pct}%
                 </span>
               ) : (
-                <span className="text-rose-400 font-semibold flex items-center">
-                  <ArrowDownRight className="w-3.5 h-3.5" /> {mom.income_change_pct}%
+                <span className="text-rose-400 font-medium flex items-center">
+                  <ArrowDownRight className="w-3 h-3" /> {mom.income_change_pct}%
                 </span>
               )}
               <span className="text-slate-500">vs prior period</span>
@@ -241,25 +241,25 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Total Expenses */}
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Expenses</span>
-            <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400">
-              <TrendingDown className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total Outflow</span>
+            <div className="p-1 rounded-md bg-rose-500/10 text-rose-400">
+              <TrendingDown className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-white mt-2">
+          <div className="text-xl font-bold text-white mt-2 tabular-nums">
             {formatCurrency(summary?.total_expenses || 0)}
           </div>
           {mom && (
-            <div className="flex items-center gap-1 mt-2 text-xs">
+            <div className="flex items-center gap-1 mt-1 text-[11px]">
               {mom.expense_change_pct <= 0 ? (
-                <span className="text-emerald-400 font-semibold flex items-center">
-                  <ArrowDownRight className="w-3.5 h-3.5" /> {mom.expense_change_pct}%
+                <span className="text-emerald-400 font-medium flex items-center">
+                  <ArrowDownRight className="w-3 h-3" /> {mom.expense_change_pct}%
                 </span>
               ) : (
-                <span className="text-rose-400 font-semibold flex items-center">
-                  <ArrowUpRight className="w-3.5 h-3.5" /> +{mom.expense_change_pct}%
+                <span className="text-rose-400 font-medium flex items-center">
+                  <ArrowUpRight className="w-3 h-3" /> +{mom.expense_change_pct}%
                 </span>
               )}
               <span className="text-slate-500">vs prior period</span>
@@ -268,19 +268,19 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Net Savings */}
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Net Savings</span>
-            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
-              <PiggyBank className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Net Savings</span>
+            <div className="p-1 rounded-md bg-amber-500/10 text-amber-400">
+              <PiggyBank className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-emerald-400 mt-2">
+          <div className="text-xl font-bold text-emerald-400 mt-2 tabular-nums">
             {formatCurrency(summary?.net_savings || 0)}
           </div>
           {mom && (
-            <div className="flex items-center gap-1 mt-2 text-xs">
-              <span className={`font-semibold ${mom.savings_change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <div className="flex items-center gap-1 mt-1 text-[11px]">
+              <span className={`font-medium ${mom.savings_change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {mom.savings_change_pct >= 0 ? `+${mom.savings_change_pct}%` : `${mom.savings_change_pct}%`}
               </span>
               <span className="text-slate-500">net shift</span>
@@ -289,17 +289,17 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Savings Rate */}
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Savings Rate</span>
-            <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">
-              <Zap className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Savings Rate</span>
+            <div className="p-1 rounded-md bg-purple-500/10 text-purple-400">
+              <Zap className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-purple-400 mt-2">
+          <div className="text-xl font-bold text-purple-400 mt-2 tabular-nums">
             {summary?.savings_rate_pct || 0}%
           </div>
-          <div className="w-full bg-[#1A2338] h-1.5 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-[#272F42] h-1 rounded-full mt-2.5 overflow-hidden">
             <div
               className="bg-purple-500 h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(summary?.savings_rate_pct || 0, 100)}%` }}
@@ -308,30 +308,30 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Daily Average Burn */}
-        <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Daily Avg Spend</span>
-            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
-              <Wallet className="w-4 h-4" />
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Daily Burn</span>
+            <div className="p-1 rounded-md bg-amber-500/10 text-amber-400">
+              <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-white mt-2">
+          <div className="text-xl font-bold text-white mt-2 tabular-nums">
             {formatCurrency(summary?.average_daily_spending || 0)}
           </div>
-          <p className="text-xs text-slate-500 mt-2">Over {summary?.days_in_period || 30} days window</p>
+          <p className="text-[11px] text-slate-500 mt-1">Over {summary?.days_in_period || 30}d window</p>
         </div>
       </div>
 
       {/* Income vs Expenses Cashflow Trends + Category Breakdown Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Income vs Expenses Bar Chart */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-bold text-white text-base">Cash Flow & Savings Trajectory</h2>
               <p className="text-xs text-slate-400">Monthly income vs expenses comparison</p>
             </div>
-            <span className="text-xs px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
+            <span className="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
               Deterministic Ledger
             </span>
           </div>
@@ -343,20 +343,20 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} />
                 <YAxis stroke="#64748B" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${(v/1000)}k`} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0D1322', borderColor: '#1E293B', borderRadius: '12px' }}
+                  contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '12px' }}
                   formatter={(val: number) => [`₹${val.toLocaleString()}`, '']}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="savings" name="Net Savings" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="savings" name="Net Savings" fill="#F59E0B" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Category Breakdown Donut */}
-        <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div>
             <h2 className="font-bold text-white text-base">Category Allocation</h2>
             <p className="text-xs text-slate-400">Share of total debit expenses</p>
@@ -376,11 +376,11 @@ export default function AnalyticsPage() {
                   paddingAngle={3}
                 >
                   {(dashboard?.category_breakdown || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#6366F1'} />
+                    <Cell key={`cell-${index}`} fill={entry.color || '#8B5CF6'} />
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0D1322', borderColor: '#1E293B', borderRadius: '12px' }}
+                  contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '12px' }}
                   formatter={(val: number) => [`₹${val.toLocaleString()}`, '']}
                 />
               </PieChart>
@@ -408,7 +408,7 @@ export default function AnalyticsPage() {
       {/* 50/30/20 Essential vs Discretionary Split & Budget Utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Essential vs Discretionary Spending */}
-        <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-5">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-bold text-white text-base">Essential vs Discretionary Allocation</h2>
@@ -420,7 +420,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Multi-segment Progress Bar */}
-          <div className="w-full bg-[#1A2338] h-3.5 rounded-full flex overflow-hidden">
+          <div className="w-full bg-[#272F42] h-3.5 rounded-full flex overflow-hidden">
             <div
               className="bg-emerald-500 h-full transition-all"
               style={{ width: `${split?.essential_pct || 50}%` }}
@@ -432,7 +432,7 @@ export default function AnalyticsPage() {
               title={`Discretionary: ${split?.discretionary_pct}%`}
             />
             <div
-              className="bg-blue-500 h-full transition-all"
+              className="bg-amber-500 h-full transition-all"
               style={{ width: `${split?.savings_investment_pct || 20}%` }}
               title={`Savings & Investments: ${split?.savings_investment_pct}%`}
             />
@@ -440,7 +440,7 @@ export default function AnalyticsPage() {
 
           {/* Breakdown Pills */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                 Needs (Essential)
@@ -449,7 +449,7 @@ export default function AnalyticsPage() {
               <span className="text-xs text-slate-400">{split?.essential_pct || 0}% of budget</span>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <div className="flex items-center gap-1.5 text-xs text-purple-400 font-semibold">
                 <div className="w-2 h-2 rounded-full bg-purple-500" />
                 Wants (Lifestyle)
@@ -458,9 +458,9 @@ export default function AnalyticsPage() {
               <span className="text-xs text-slate-400">{split?.discretionary_pct || 0}% of budget</span>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
-              <div className="flex items-center gap-1.5 text-xs text-blue-400 font-semibold">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
+              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold">
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
                 Savings & SIPs
               </div>
               <div className="text-base font-bold text-white mt-1">{formatCurrency(split?.savings_investment_amount || 0)}</div>
@@ -470,7 +470,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Budget Utilization Gauges */}
-        <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div>
             <h2 className="font-bold text-white text-base">Category Budget Utilization</h2>
             <p className="text-xs text-slate-400">Actual period spending vs monthly limits</p>
@@ -478,7 +478,7 @@ export default function AnalyticsPage() {
 
           <div className="space-y-3.5 max-h-56 overflow-y-auto pr-1">
             {(dashboard?.budget_utilization || []).map((b, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2">
+              <div key={idx} className="p-3 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-slate-200">{b.category_name}</span>
                   <div className="flex items-center gap-2">
@@ -488,7 +488,7 @@ export default function AnalyticsPage() {
                     </span>
                   </div>
                 </div>
-                <div className="w-full bg-[#1A2338] h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#272F42] h-2 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
                       b.is_over_budget ? 'bg-rose-500' : b.utilization_pct > 80 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -505,9 +505,9 @@ export default function AnalyticsPage() {
       {/* Top Merchants Leaderboard & Recurring Commitments */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Merchants */}
-        <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
               <ShoppingBag className="w-5 h-5" />
             </div>
             <div>
@@ -533,7 +533,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Recurring Expenses Schedule */}
-        <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5">
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
               <RefreshCw className="w-5 h-5" />
@@ -559,16 +559,16 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Predictive Expense Forecasting Engine */}
-      <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-6">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E293B] pb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h2 className="font-bold text-white text-base">Predictive Expense Forecasting Engine</h2>
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">
                   {forecast?.confidence_score ? `${Math.round(forecast.confidence_score * 100)}% Confidence` : '85% CI'}
                 </span>
               </div>
@@ -579,10 +579,10 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="flex items-center space-x-3 text-xs">
-            <div className="px-3 py-1.5 rounded-xl bg-[#11192C] border border-[#1E293B] text-slate-300">
+            <div className="px-3 py-1.5 rounded-xl bg-[#222735] border border-[#1E293B] text-slate-300">
               Trend: <strong className="text-white capitalize">{forecast?.trend || 'Stable'}</strong>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[#11192C] border border-[#1E293B] text-slate-300">
+            <div className="px-3 py-1.5 rounded-xl bg-[#222735] border border-[#1E293B] text-slate-300">
               Daily Burn: <strong className="text-white">{formatCurrency(forecast?.historical_average_daily || 0)}/day</strong>
             </div>
           </div>
@@ -598,7 +598,7 @@ export default function AnalyticsPage() {
 
         {/* 3 Horizon KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B]">
+          <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B]">
             <span className="text-[10px] text-slate-400 uppercase font-semibold">Next 30 Days Forecast</span>
             <div className="text-2xl font-extrabold text-white mt-1">
               {formatCurrency(forecast?.projected_next_30_days_total || 0)}
@@ -610,7 +610,7 @@ export default function AnalyticsPage() {
             )}
           </div>
 
-          <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B]">
+          <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B]">
             <span className="text-[10px] text-slate-400 uppercase font-semibold">Next 60 Days Cumulative</span>
             <div className="text-2xl font-extrabold text-white mt-1">
               {formatCurrency(forecast?.projected_next_60_days_total || 0)}
@@ -620,7 +620,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B]">
+          <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B]">
             <span className="text-[10px] text-slate-400 uppercase font-semibold">Next 90 Days Cumulative</span>
             <div className="text-2xl font-extrabold text-white mt-1">
               {formatCurrency(forecast?.projected_next_90_days_total || 0)}
@@ -633,13 +633,13 @@ export default function AnalyticsPage() {
 
         {/* Human Readable Explanation Box */}
         {forecast?.human_readable_explanation && (
-          <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2">
-            <span className="text-[10px] text-blue-400 uppercase font-bold tracking-wider">AI Forecast Synthesis</span>
+          <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2">
+            <span className="text-[10px] text-amber-400 uppercase font-bold tracking-wider">AI Forecast Synthesis</span>
             <p className="text-xs text-slate-200 leading-relaxed">{forecast.human_readable_explanation}</p>
             {forecast.major_contributing_factors && forecast.major_contributing_factors.length > 0 && (
               <div className="pt-2 flex flex-wrap gap-1.5">
                 {forecast.major_contributing_factors.map((factor, fIdx) => (
-                  <span key={fIdx} className="px-2.5 py-1 rounded-md bg-[#0D1322] border border-[#1E293B] text-[11px] text-slate-300">
+                  <span key={fIdx} className="px-2.5 py-1 rounded-md bg-[#0F172A] border border-[#1E293B] text-[11px] text-slate-300">
                     • {factor}
                   </span>
                 ))}
@@ -659,20 +659,20 @@ export default function AnalyticsPage() {
               <AreaChart data={forecast?.forecast_points || []}>
                 <defs>
                   <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
                 <XAxis dataKey="date" stroke="#64748B" fontSize={11} tickLine={false} />
                 <YAxis stroke="#64748B" fontSize={11} tickLine={false} tickFormatter={(val) => `₹${val}`} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0D1322', borderColor: '#1E293B', borderRadius: '12px' }}
+                  contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '12px' }}
                   formatter={(val: number) => [`₹${val.toLocaleString()}`, '']}
                 />
-                <Area type="monotone" dataKey="upper_bound" stroke="#60A5FA" strokeDasharray="4 4" strokeWidth={1} fillOpacity={0} name="Upper Bound" />
-                <Area type="monotone" dataKey="projected_expense" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#forecastGrad)" name="Projected Expense" />
-                <Area type="monotone" dataKey="lower_bound" stroke="#93C5FD" strokeDasharray="4 4" strokeWidth={1} fillOpacity={0} name="Lower Bound" />
+                <Area type="monotone" dataKey="upper_bound" stroke="#FBBF24" strokeDasharray="4 4" strokeWidth={1} fillOpacity={0} name="Upper Bound" />
+                <Area type="monotone" dataKey="projected_expense" stroke="#F59E0B" strokeWidth={2.5} fillOpacity={1} fill="url(#forecastGrad)" name="Projected Expense" />
+                <Area type="monotone" dataKey="lower_bound" stroke="#FCD34D" strokeDasharray="4 4" strokeWidth={1} fillOpacity={0} name="Lower Bound" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -684,10 +684,10 @@ export default function AnalyticsPage() {
             <span className="text-xs font-bold text-white block">Category-Level Future Projections</span>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {forecast.category_forecasts.map((cat, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2">
+                <div key={idx} className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-xs text-white">{cat.category_name}</span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">
                       {cat.percentage_of_total}% share
                     </span>
                   </div>
@@ -703,7 +703,7 @@ export default function AnalyticsPage() {
 
         {/* Holdout Model Evaluation vs Naive Baseline Benchmark Card */}
         {forecast?.evaluation && (
-          <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-3">
+          <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs font-bold text-white">Model Evaluation Benchmark (Historical Holdout)</span>
@@ -715,22 +715,22 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-2.5 rounded-lg bg-[#0D1322] border border-[#1E293B]">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                 <span className="text-[10px] text-slate-400 uppercase">MAPE (Advanced)</span>
                 <div className="text-sm font-bold text-emerald-400 mt-0.5">{forecast.evaluation.mape}%</div>
                 <span className="text-[10px] text-slate-500">Baseline: {forecast.evaluation.baseline_mape}%</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0D1322] border border-[#1E293B]">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                 <span className="text-[10px] text-slate-400 uppercase">RMSE (Advanced)</span>
                 <div className="text-sm font-bold text-emerald-400 mt-0.5">₹{forecast.evaluation.rmse}</div>
                 <span className="text-[10px] text-slate-500">Baseline: ₹{forecast.evaluation.baseline_rmse}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0D1322] border border-[#1E293B]">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                 <span className="text-[10px] text-slate-400 uppercase">MAE (Advanced)</span>
                 <div className="text-sm font-bold text-emerald-400 mt-0.5">₹{forecast.evaluation.mae}</div>
                 <span className="text-[10px] text-slate-500">Baseline: ₹{forecast.evaluation.baseline_mae}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0D1322] border border-[#1E293B]">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                 <span className="text-[10px] text-slate-400 uppercase">Holdout Sample</span>
                 <div className="text-sm font-bold text-white mt-0.5">{forecast.evaluation.evaluation_holdout_days} Days</div>
                 <span className="text-[10px] text-slate-500">Temporal Split</span>
@@ -741,9 +741,9 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Interactive What-If Scenario Simulator */}
-      <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-6">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-6">
         <div className="flex items-center space-x-3 border-b border-[#1E293B] pb-4">
-          <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
+          <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400">
             <Sliders className="w-5 h-5" />
           </div>
           <div>
@@ -762,9 +762,9 @@ export default function AnalyticsPage() {
               step={5000}
               value={incomeChange}
               onChange={(e) => setIncomeChange(Number(e.target.value))}
-              className="w-full h-2 bg-[#1A2338] rounded-lg accent-blue-500"
+              className="w-full h-2 bg-[#272F42] rounded-lg accent-amber-500"
             />
-            <span className="text-xs text-blue-400 font-bold mt-1 block">+{formatCurrency(incomeChange)}/mo</span>
+            <span className="text-xs text-amber-400 font-bold mt-1 block">+{formatCurrency(incomeChange)}/mo</span>
           </div>
 
           <div>
@@ -776,7 +776,7 @@ export default function AnalyticsPage() {
               step={1000}
               value={expenseCut}
               onChange={(e) => setExpenseCut(Number(e.target.value))}
-              className="w-full h-2 bg-[#1A2338] rounded-lg accent-emerald-500"
+              className="w-full h-2 bg-[#272F42] rounded-lg accent-emerald-500"
             />
             <span className="text-xs text-emerald-400 font-bold mt-1 block">-{formatCurrency(expenseCut)}/mo burn</span>
           </div>
@@ -790,7 +790,7 @@ export default function AnalyticsPage() {
               step={10000}
               value={oneTimeSpend}
               onChange={(e) => setOneTimeSpend(Number(e.target.value))}
-              className="w-full h-2 bg-[#1A2338] rounded-lg accent-rose-500"
+              className="w-full h-2 bg-[#272F42] rounded-lg accent-rose-500"
             />
             <span className="text-xs text-rose-400 font-bold mt-1 block">{formatCurrency(oneTimeSpend)}</span>
           </div>
@@ -804,14 +804,14 @@ export default function AnalyticsPage() {
               step={0.5}
               value={inflation}
               onChange={(e) => setInflation(Number(e.target.value))}
-              className="w-full h-2 bg-[#1A2338] rounded-lg accent-amber-500"
+              className="w-full h-2 bg-[#272F42] rounded-lg accent-amber-500"
             />
             <span className="text-xs text-amber-400 font-bold mt-1 block">{inflation}% Annual</span>
           </div>
         </div>
 
         {/* Simulation Output Box */}
-        <div className="p-5 rounded-xl bg-[#11192C] border border-[#1E293B] flex items-center justify-between">
+        <div className="p-5 rounded-xl bg-[#222735] border border-[#1E293B] flex items-center justify-between">
           <div>
             <span className="text-xs text-slate-400">Projected 24-Month Portfolio with Simulation:</span>
             <div className="text-2xl font-extrabold text-white mt-0.5">{formatCurrency(projected2YearCorpus)}</div>
@@ -824,7 +824,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Statistical Anomaly & Outlier Detection Dashboard */}
-      <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-6">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E293B] pb-4">
           <div className="flex items-center space-x-3">
             <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
@@ -848,9 +848,9 @@ export default function AnalyticsPage() {
           <button
             onClick={handleScanAnomalies}
             disabled={isScanningAnomalies}
-            className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-xs font-semibold text-slate-200 transition-all shadow-sm"
+            className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#222735] hover:bg-[#1E293B] border border-[#1E293B] text-xs font-semibold text-slate-200 transition-all shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-blue-400 ${isScanningAnomalies ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isScanningAnomalies ? 'animate-spin' : ''}`} />
             <span>{isScanningAnomalies ? 'Scanning Ledger...' : 'Run Anomaly Scan'}</span>
           </button>
         </div>
@@ -858,21 +858,21 @@ export default function AnalyticsPage() {
         {/* Anomaly KPI Summary Bar */}
         {anomalyData && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Total Anomalies</span>
               <div className="text-xl font-bold text-white mt-0.5">{anomalyData.total_anomalies}</div>
             </div>
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <span className="text-[10px] text-rose-400 uppercase font-semibold">Critical / High Severity</span>
               <div className="text-xl font-bold text-rose-400 mt-0.5">
                 {(anomalyData.critical_count || 0) + (anomalyData.high_count || 0)}
               </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <span className="text-[10px] text-amber-400 uppercase font-semibold">Medium Severity</span>
               <div className="text-xl font-bold text-amber-400 mt-0.5">{anomalyData.medium_count || 0}</div>
             </div>
-            <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B]">
+            <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B]">
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Net Excess Deviation</span>
               <div className="text-xl font-bold text-emerald-400 mt-0.5">
                 +{formatCurrency(anomalyData.total_excess_deviation || 0)}
@@ -890,8 +890,8 @@ export default function AnalyticsPage() {
               onClick={() => setAnomalySeverityFilter(sev)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 anomalySeverityFilter === sev
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-[#11192C] text-slate-400 hover:text-white border border-[#1E293B]'
+                  ? 'bg-amber-500 text-[#0F172A] shadow-sm'
+                  : 'bg-[#222735] text-slate-400 hover:text-white border border-[#1E293B]'
               }`}
             >
               {sev.toUpperCase()}
@@ -911,12 +911,12 @@ export default function AnalyticsPage() {
                   ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
                   : isHigh
                   ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                  : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+                  : 'bg-amber-500/20 text-amber-400 border-amber-500/30';
 
                 return (
                   <div
                     key={anom.id}
-                    className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-3 hover:border-slate-700 transition-all"
+                    className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-3 hover:border-slate-700 transition-all"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center space-x-2.5">
@@ -944,7 +944,7 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed bg-[#0D1322] p-2.5 rounded-lg border border-[#1E293B]/60">
+                    <p className="text-xs text-slate-300 leading-relaxed bg-[#0F172A] p-2.5 rounded-lg border border-[#1E293B]/60">
                       {anom.explanation}
                     </p>
 
@@ -956,7 +956,7 @@ export default function AnalyticsPage() {
                           {anom.affected_transactions.map((tx, idx) => (
                             <div
                               key={idx}
-                              className="px-2.5 py-1 rounded-lg bg-[#0D1322] border border-[#1E293B] text-[11px] text-slate-300 flex items-center space-x-2"
+                              className="px-2.5 py-1 rounded-lg bg-[#0F172A] border border-[#1E293B] text-[11px] text-slate-300 flex items-center space-x-2"
                             >
                               <span className="text-slate-400">{tx.transaction_date}</span>
                               <span className="font-medium text-white">{tx.merchant || tx.description}</span>
@@ -971,7 +971,7 @@ export default function AnalyticsPage() {
               })}
           </div>
         ) : (
-          <div className="p-6 rounded-xl bg-[#11192C] border border-[#1E293B] text-center space-y-2">
+          <div className="p-6 rounded-xl bg-[#222735] border border-[#1E293B] text-center space-y-2">
             <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
             <div className="font-bold text-white text-sm">All Spending Patterns Healthy</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">

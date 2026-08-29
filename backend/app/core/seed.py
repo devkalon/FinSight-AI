@@ -1,4 +1,5 @@
 import asyncio
+import os
 from decimal import Decimal
 from datetime import date, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -114,11 +115,14 @@ async def seed_database():
                 )
                 db.add(merchant)
 
-        # 3. Seed Demo User
+        # 3. Seed Demo User (opt-in only — never in a real/production deploy).
+        # A fresh install starts with zero user data; set FINSIGHT_SEED_DEMO=1 to
+        # populate the "Alex Mercer" sample account for local demos/screenshots.
+        seed_demo = os.getenv("FINSIGHT_SEED_DEMO", "").strip().lower() in ("1", "true", "yes")
         demo_email = "alex.mercer@finsight.ai"
         u_res = await db.execute(select(User).filter(User.email == demo_email))
         demo_user = u_res.scalars().first()
-        if not demo_user:
+        if seed_demo and not demo_user:
             demo_user = User(
                 email=demo_email,
                 hashed_password=get_password_hash("FinSightDemo2026!"),

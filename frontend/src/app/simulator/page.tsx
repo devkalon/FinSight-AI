@@ -122,24 +122,24 @@ export default function WhatIfSimulatorPage() {
   const healthDelta = result?.health_score_delta ?? 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Deterministic What-If Financial Simulator</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold text-xs border border-blue-500/20">
-              Decimal-Safe Model
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">What-If Financial Simulator</h1>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium text-[11px] border border-amber-500/20">
+              Deterministic Math Model
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Simulate income hikes, expense cutbacks, subscription pruning, and goal accelerations with mathematical precision
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Simulate income hikes, expense cutbacks, subscription pruning, and goal accelerations with decimal-safe precision
           </p>
         </div>
 
         <button
           onClick={() => applyPreset('reset')}
-          className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-slate-300 hover:text-white text-xs font-semibold transition-all self-start sm:self-auto"
+          className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-[#222735] hover:bg-[#272F42] border border-[#1E293B] text-slate-300 text-xs font-medium transition-all self-start sm:self-auto"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Reset to Baseline</span>
@@ -147,7 +147,7 @@ export default function WhatIfSimulatorPage() {
       </div>
 
       {/* Quick Scenario Preset Chips */}
-      <div className="p-4 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-2">
+      <div className="p-4 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-2">
         <div className="flex items-center space-x-2 text-xs font-semibold text-slate-400">
           <Zap className="w-3.5 h-3.5 text-amber-400" />
           <span>Quick Scenario Experiments:</span>
@@ -157,8 +157,8 @@ export default function WhatIfSimulatorPage() {
             onClick={() => applyPreset('food_2000')}
             className={`px-3 py-1.5 rounded-xl border transition-all ${
               foodReduction === 2000 && incomePct === 0 && subReduction === 0
-                ? 'bg-blue-600 border-blue-500 text-white shadow-md'
-                : 'bg-[#11192C] border-[#1E293B] text-slate-300 hover:text-white'
+                ? 'bg-amber-500 border-amber-500 text-[#0F172A] shadow-md'
+                : 'bg-[#222735] border-[#1E293B] text-slate-300 hover:text-white'
             }`}
           >
             🍔 Reduce Food Spend by ₹2,000/mo
@@ -168,8 +168,8 @@ export default function WhatIfSimulatorPage() {
             onClick={() => applyPreset('income_10pct')}
             className={`px-3 py-1.5 rounded-xl border transition-all ${
               incomePct === 10 && foodReduction === 0
-                ? 'bg-blue-600 border-blue-500 text-white shadow-md'
-                : 'bg-[#11192C] border-[#1E293B] text-slate-300 hover:text-white'
+                ? 'bg-amber-500 border-amber-500 text-[#0F172A] shadow-md'
+                : 'bg-[#222735] border-[#1E293B] text-slate-300 hover:text-white'
             }`}
           >
             💼 Increase Income by +10%
@@ -179,8 +179,8 @@ export default function WhatIfSimulatorPage() {
             onClick={() => applyPreset('cancel_subs')}
             className={`px-3 py-1.5 rounded-xl border transition-all ${
               subReduction === 1500 && foodReduction === 0
-                ? 'bg-blue-600 border-blue-500 text-white shadow-md'
-                : 'bg-[#11192C] border-[#1E293B] text-slate-300 hover:text-white'
+                ? 'bg-amber-500 border-amber-500 text-[#0F172A] shadow-md'
+                : 'bg-[#222735] border-[#1E293B] text-slate-300 hover:text-white'
             }`}
           >
             ✂️ Cancel OTT / Gym (-₹1,500/mo)
@@ -191,7 +191,7 @@ export default function WhatIfSimulatorPage() {
             className={`px-3 py-1.5 rounded-xl border transition-all ${
               incomePct === 10 && foodReduction === 2000 && extraGoalContribution === 10000
                 ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
-                : 'bg-[#11192C] border-[#1E293B] text-slate-300 hover:text-white'
+                : 'bg-[#222735] border-[#1E293B] text-slate-300 hover:text-white'
             }`}
           >
             🚀 Full Turbo Acceleration (+10% Inc, -₹6.5k Exp, +₹10k Goal)
@@ -202,9 +202,9 @@ export default function WhatIfSimulatorPage() {
       {/* Main Grid: Levers on Left, Comparison on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Interactive Levers Control Panel (5 Cols) */}
-        <div className="lg:col-span-5 p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-6">
+        <div className="lg:col-span-5 p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-6">
           <div className="flex items-center space-x-3 border-b border-[#1E293B] pb-3">
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
               <Sliders className="w-5 h-5" />
             </div>
             <div>
@@ -228,7 +228,7 @@ export default function WhatIfSimulatorPage() {
                 step={5}
                 value={incomePct}
                 onChange={(e) => setIncomePct(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-emerald-500"
               />
             </div>
 
@@ -244,7 +244,7 @@ export default function WhatIfSimulatorPage() {
                 step={2500}
                 value={incomeAbs}
                 onChange={(e) => setIncomeAbs(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-emerald-500"
               />
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function WhatIfSimulatorPage() {
             <div>
               <div className="flex justify-between text-xs text-slate-300 font-semibold mb-1.5">
                 <span>Reduce Food & Dining Spend:</span>
-                <span className="text-blue-400 font-bold">-{formatCurrency(foodReduction)}/mo</span>
+                <span className="text-amber-400 font-bold">-{formatCurrency(foodReduction)}/mo</span>
               </div>
               <input
                 type="range"
@@ -264,7 +264,7 @@ export default function WhatIfSimulatorPage() {
                 step={500}
                 value={foodReduction}
                 onChange={(e) => setFoodReduction(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-amber-500"
               />
             </div>
 
@@ -280,7 +280,7 @@ export default function WhatIfSimulatorPage() {
                 step={500}
                 value={shoppingReduction}
                 onChange={(e) => setShoppingReduction(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-purple-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
 
@@ -296,7 +296,7 @@ export default function WhatIfSimulatorPage() {
                 step={250}
                 value={subReduction}
                 onChange={(e) => setSubReduction(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-rose-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-rose-500"
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function WhatIfSimulatorPage() {
             <div>
               <div className="flex justify-between text-xs text-slate-300 font-semibold mb-1.5">
                 <span>Extra Goal Monthly Contribution:</span>
-                <span className="text-indigo-400 font-bold">+{formatCurrency(extraGoalContribution)}/mo</span>
+                <span className="text-purple-400 font-bold">+{formatCurrency(extraGoalContribution)}/mo</span>
               </div>
               <input
                 type="range"
@@ -316,7 +316,7 @@ export default function WhatIfSimulatorPage() {
                 step={1000}
                 value={extraGoalContribution}
                 onChange={(e) => setExtraGoalContribution(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
 
@@ -332,7 +332,7 @@ export default function WhatIfSimulatorPage() {
                 step={0.5}
                 value={investmentRoi}
                 onChange={(e) => setInvestmentRoi(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-amber-500"
+                className="w-full h-2 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-amber-500"
               />
             </div>
           </div>
@@ -343,7 +343,7 @@ export default function WhatIfSimulatorPage() {
           {/* Side-by-Side Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Current Scenario Box */}
-            <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+            <div className="p-5 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
               <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Baseline</span>
                 <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-300">
@@ -362,7 +362,7 @@ export default function WhatIfSimulatorPage() {
                 </div>
                 <div className="flex justify-between pt-2 border-t border-[#1E293B]">
                   <span className="text-slate-300 font-semibold">Net Cash Flow Surplus:</span>
-                  <span className="font-bold text-blue-400">{formatCurrency(curr?.monthly_net_cash_flow || 40000)}/mo</span>
+                  <span className="font-bold text-amber-400">{formatCurrency(curr?.monthly_net_cash_flow || 40000)}/mo</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Savings Rate:</span>
@@ -380,10 +380,10 @@ export default function WhatIfSimulatorPage() {
             </div>
 
             {/* Simulated Scenario Box */}
-            <div className="p-5 rounded-2xl bg-[#0D1322] border-2 border-blue-500/50 space-y-4 shadow-xl shadow-blue-500/10">
-              <div className="flex items-center justify-between border-b border-blue-500/30 pb-3">
-                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Simulated Scenario</span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+            <div className="p-5 rounded-2xl bg-[#0F172A] border-2 border-amber-500/50 space-y-4 shadow-xl shadow-amber-500/10">
+              <div className="flex items-center justify-between border-b border-amber-500/30 pb-3">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Simulated Scenario</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   What-If Model
                 </span>
               </div>
@@ -405,7 +405,7 @@ export default function WhatIfSimulatorPage() {
                   <div className="flex items-center space-x-1.5 font-bold text-white">
                     <span>{formatCurrency(sim?.monthly_expenses || 35000)}</span>
                     {(sim?.monthly_expenses || 0) < (curr?.monthly_expenses || 0) && (
-                      <span className="text-[10px] text-blue-400">
+                      <span className="text-[10px] text-amber-400">
                         (-{formatCurrency((curr?.monthly_expenses || 0) - (sim?.monthly_expenses || 0))})
                       </span>
                     )}
@@ -461,8 +461,8 @@ export default function WhatIfSimulatorPage() {
 
           {/* AI Explanation of Deterministic Output */}
           {result?.ai_explanation && (
-            <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 space-y-1.5 text-xs text-blue-200">
-              <div className="flex items-center space-x-2 font-bold text-blue-400">
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1.5 text-xs text-amber-200">
+              <div className="flex items-center space-x-2 font-bold text-amber-400">
                 <Sparkles className="w-4 h-4" />
                 <span>AI Simulation Synthesis (Deterministic Breakdown)</span>
               </div>
@@ -471,15 +471,15 @@ export default function WhatIfSimulatorPage() {
           )}
 
           {/* Goal Completion Acceleration Impact */}
-          <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-3.5">
+          <div className="p-5 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-3.5">
             <div className="flex items-center space-x-2.5 text-xs font-bold text-white">
-              <Target className="w-4 h-4 text-indigo-400" />
+              <Target className="w-4 h-4 text-purple-400" />
               <span>Goal Completion Timeline Acceleration Impact</span>
             </div>
 
             <div className="space-y-2.5">
               {result?.goal_impacts?.map((g, idx) => (
-                <div key={idx} className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] flex items-center justify-between text-xs">
+                <div key={idx} className="p-3 rounded-xl bg-[#222735] border border-[#1E293B] flex items-center justify-between text-xs">
                   <div>
                     <h4 className="font-bold text-white">{g.goal_title}</h4>
                     <span className="text-slate-400 text-[11px]">
@@ -506,25 +506,25 @@ export default function WhatIfSimulatorPage() {
           </div>
 
           {/* Guru Critiques on Simulation */}
-          <div className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-3">
+          <div className="p-5 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-3">
             <div className="flex items-center space-x-2 text-xs font-bold text-slate-300">
               <Award className="w-4 h-4 text-amber-400" />
               <span>Philosophy Critiques on This Simulated Scenario</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-              <div className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+              <div className="p-3 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
                 <span className="font-bold text-amber-400 text-[11px]">Warren Buffett</span>
                 <p className="text-slate-300 text-[11px] leading-relaxed">{result?.guru_critique?.buffett}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+              <div className="p-3 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
                 <span className="font-bold text-purple-400 text-[11px]">Robert Kiyosaki</span>
                 <p className="text-slate-300 text-[11px] leading-relaxed">{result?.guru_critique?.kiyosaki}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
-                <span className="font-bold text-blue-400 text-[11px]">Ramit Sethi</span>
+              <div className="p-3 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
+                <span className="font-bold text-amber-400 text-[11px]">Ramit Sethi</span>
                 <p className="text-slate-300 text-[11px] leading-relaxed">{result?.guru_critique?.sethi}</p>
               </div>
             </div>

@@ -20,6 +20,21 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class GoogleOAuthRequest(BaseModel):
+    id_token: Optional[str] = None
+    access_token: Optional[str] = None
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    google_id: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+class GoogleAuthUrlResponse(BaseModel):
+    url: str
+    client_id_configured: bool
+
+class GoogleCallbackRequest(BaseModel):
+    code: str
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

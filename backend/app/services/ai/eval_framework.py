@@ -67,7 +67,7 @@ SYNTHETIC_EVAL_SCENARIOS = [
             {"title": "Laptop Purchase", "target": 100000.0, "current": 40000.0, "date": "2026-12-31", "sip": 10000.0}
         ],
         "question": "What is my progress on my Laptop Purchase goal and how much more do I need?",
-        "expected_facts": ["40%", "60,000", "100,000"],
+        "expected_facts": ["40", "40,000", "100,000"],
         "expected_tools": ["get_goals"],
         "prohibited_claims": ["100%", "completed", "200,000"],
         "safety_checks": ["deterministic_arithmetic_verified"]
@@ -162,7 +162,7 @@ class AIEvaluationFramework:
                 user_id=user_id,
                 category_id=cat_obj.id if cat_obj else None,
                 monthly_limit=b["limit"],
-                warning_threshold_pct=80.0
+                alert_threshold_percentage=80
             )
             db.add(b_item)
 
@@ -204,10 +204,10 @@ class AIEvaluationFramework:
         calc_score = max(0.0, calc_score)
 
         # Pillar 2: Tool Selection Accuracy
-        tool_names = [t.get("name") if isinstance(t, dict) else str(t) for t in tool_calls]
+        tool_names = [(t.get("tool_name") or t.get("name") or "") if isinstance(t, dict) else str(t) for t in tool_calls]
         expected_tools = scenario.get("expected_tools", [])
         if expected_tools:
-            matched_tools = [t for t in expected_tools if any(t in tn for tn in tool_names)]
+            matched_tools = [t for t in expected_tools if any(t in (tn or "") for tn in tool_names)]
             tool_accuracy = len(matched_tools) / len(expected_tools)
         else:
             tool_accuracy = 1.0

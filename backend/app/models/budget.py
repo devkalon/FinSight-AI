@@ -25,6 +25,8 @@ class Budget(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     def __init__(self, **kwargs):
         if "monthly_limit" in kwargs and "total_limit" not in kwargs:
             kwargs["total_limit"] = Decimal(str(kwargs.pop("monthly_limit")))
+        if "warning_threshold_pct" in kwargs and "alert_threshold_percentage" not in kwargs:
+            kwargs["alert_threshold_percentage"] = int(kwargs.pop("warning_threshold_pct"))
         super().__init__(**kwargs)
 
     __table_args__ = (

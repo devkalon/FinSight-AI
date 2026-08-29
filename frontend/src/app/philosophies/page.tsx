@@ -73,32 +73,32 @@ export default function PhilosophiesPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1D263B] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Financial Philosophy Comparison Engine</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold text-xs border border-blue-500/20">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Financial Philosophy Engine</h1>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium text-[11px] border border-amber-500/20">
               Structured Knowledge
             </span>
           </div>
-          <p className="text-slate-400 text-xs mt-0.5">
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             Educational side-by-side comparison of documented financial schools of thought and frameworks.
           </p>
         </div>
       </div>
 
       {/* Philosophy Profiles Overview (4 Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {philosophyProfiles.map((p) => (
-          <div key={p.id} className="p-4 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-2 flex flex-col justify-between">
+          <div key={p.id} className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2 flex flex-col justify-between hover:border-[#334155] transition-all">
             <div>
-              <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">{p.school}</span>
-              <h3 className="font-bold text-white text-sm">{p.name}</h3>
-              <p className="text-slate-300 text-xs mt-2 leading-relaxed italic">"{p.coreTenet}"</p>
+              <span className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider block mb-1">{p.school}</span>
+              <h3 className="font-semibold text-white text-sm">{p.name}</h3>
+              <p className="text-slate-300 text-xs mt-1.5 leading-relaxed italic">&ldquo;{p.coreTenet}&rdquo;</p>
             </div>
-            <div className="pt-2 border-t border-[#1D263B] text-[11px] text-slate-400">
+            <div className="pt-2 border-t border-[#1E293B] text-[11px] text-slate-400">
               <strong>Focus:</strong> {p.focus}
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function PhilosophiesPage() {
       </div>
 
       {/* Query & Dimension Selector */}
-      <div className="p-6 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-4">
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-[#272F42] space-y-4">
         <h2 className="font-bold text-white text-base">Explore a Financial Dilemma</h2>
 
         {/* Dimension Chips */}
@@ -125,8 +125,8 @@ export default function PhilosophiesPage() {
               onClick={() => setSelectedDimension(dim.id)}
               className={`px-3 py-1.5 rounded-xl font-semibold transition-all whitespace-nowrap ${
                 selectedDimension === dim.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-[#0A0E1A] border border-[#1D263B] text-slate-400 hover:text-white'
+                  ? 'bg-amber-500 text-[#0F172A] shadow-sm'
+                  : 'bg-[#0B1120] border border-[#272F42] text-slate-400 hover:text-white'
               }`}
             >
               {dim.label}
@@ -142,12 +142,12 @@ export default function PhilosophiesPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCompare()}
-            className="flex-1 p-3 bg-[#0A0E1A] border border-[#1D263B] rounded-xl text-slate-200 text-xs focus:outline-none focus:border-blue-500"
+            className="flex-1 p-3 bg-[#0B1120] border border-[#272F42] rounded-xl text-slate-200 text-xs focus:outline-none focus:border-amber-500"
           />
           <button
             onClick={() => handleCompare()}
             disabled={loading || !query.trim()}
-            className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/25 disabled:opacity-50 transition-all flex items-center space-x-1.5"
+            className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-bold shadow-md shadow-amber-500/25 disabled:opacity-50 transition-all flex items-center space-x-1.5"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>{loading ? 'Synthesizing...' : 'Compare Perspectives'}</span>
@@ -164,7 +164,7 @@ export default function PhilosophiesPage() {
                 setQuery(sq);
                 handleCompare(sq);
               }}
-              className="p-1.5 px-2.5 rounded-lg bg-[#0A0E1A] hover:bg-[#12192B] border border-[#1D263B] text-slate-300 text-left transition-colors"
+              className="p-1.5 px-2.5 rounded-lg bg-[#0B1120] hover:bg-[#1E293B] border border-[#272F42] text-slate-300 text-left transition-colors"
             >
               {sq}
             </button>
@@ -178,17 +178,17 @@ export default function PhilosophiesPage() {
           {/* Side-by-Side Perspectives Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {comparison.perspectives.map((persp, idx) => (
-              <div key={idx} className="p-5 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-3 flex flex-col justify-between">
+              <div key={idx} className="p-5 rounded-2xl bg-[#0F172A] border border-[#272F42] space-y-3 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between border-b border-[#1D263B] pb-2 mb-3">
+                  <div className="flex items-center justify-between border-b border-[#272F42] pb-2 mb-3">
                     <span className="text-xs font-bold text-white">{persp.guru_name}</span>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       {persp.school_of_thought}
                     </span>
                   </div>
                   <p className="text-slate-200 text-xs leading-relaxed">{persp.viewpoint}</p>
                 </div>
-                <div className="p-2.5 rounded-xl bg-[#0A0E1A] border border-[#1D263B] text-[11px] text-slate-400">
+                <div className="p-2.5 rounded-xl bg-[#0B1120] border border-[#272F42] text-[11px] text-slate-400">
                   <strong className="text-slate-300 block mb-0.5">Core Principle:</strong>
                   <span>{persp.key_principle}</span>
                 </div>
@@ -198,7 +198,7 @@ export default function PhilosophiesPage() {
 
           {/* Key Differences & Areas of Agreement */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-3">
+            <div className="p-5 rounded-2xl bg-[#0F172A] border border-[#272F42] space-y-3">
               <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs">
                 <Scale className="w-4 h-4" />
                 <span>Key Divergences & Differences</span>
@@ -213,7 +213,7 @@ export default function PhilosophiesPage() {
               </ul>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#0F1626] border border-[#1D263B] space-y-3">
+            <div className="p-5 rounded-2xl bg-[#0F172A] border border-[#272F42] space-y-3">
               <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Areas of Universal Agreement</span>
@@ -230,8 +230,8 @@ export default function PhilosophiesPage() {
           </div>
 
           {/* Balanced Synthesis Box */}
-          <div className="p-6 rounded-2xl bg-[#0F1626] border border-blue-500/30 space-y-3">
-            <div className="flex items-center space-x-2 text-blue-400 font-bold text-xs">
+          <div className="p-6 rounded-2xl bg-[#0F172A] border border-amber-500/30 space-y-3">
+            <div className="flex items-center space-x-2 text-amber-400 font-bold text-xs">
               <Sparkles className="w-4 h-4" />
               <span>Balanced Synthesis & Actionable Framework:</span>
             </div>

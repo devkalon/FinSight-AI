@@ -131,18 +131,18 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Financial Goals & SIP Compounding</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Financial Goals & SIP Compounding</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             Deterministic milestone trackers, dynamic required monthly savings & wealth compounding simulator
           </p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-semibold shadow-xs transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>Create New Goal</span>
@@ -150,36 +150,36 @@ export default function GoalsPage() {
       </div>
 
       {/* Goals Progress Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {goals.map((g) => {
           const reqMonthly = g.required_monthly_saving || g.required_monthly_sip || 0;
           const isCompleted = g.current_amount >= g.target_amount || g.status === 'achieved';
 
           return (
-            <div key={g.id} className="p-5 rounded-2xl bg-[#0D1322] border border-[#1E293B] flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all">
+            <div key={g.id} className="p-4 sm:p-5 rounded-xl bg-[#222735] border border-[#1E293B] flex flex-col justify-between space-y-4 hover:border-[#334155] transition-all">
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-[10px] px-2 py-0.5 rounded font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                     {g.category}
                   </span>
-                  <div className="flex items-center space-x-1.5 text-slate-400 text-xs">
-                    <Calendar className="w-3.5 h-3.5" />
+                  <div className="flex items-center space-x-1 text-slate-400 text-[11px]">
+                    <Calendar className="w-3 h-3" />
                     <span>{formatDate(g.target_date)}</span>
                   </div>
                 </div>
 
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-bold text-white text-base mb-1">{g.title}</h3>
-                    <div className="text-xl font-extrabold text-slate-100">
+                    <h3 className="font-semibold text-white text-sm mb-1">{g.title}</h3>
+                    <div className="text-xl font-bold text-slate-100 tabular-nums">
                       {formatCurrency(g.current_amount)} <span className="text-slate-500 text-xs font-normal">/ {formatCurrency(g.target_amount)}</span>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteGoal(g.id)}
-                    className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-[#11192C] transition-colors"
+                    className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-[#272F42] transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -189,14 +189,14 @@ export default function GoalsPage() {
                 <div>
                   <div className="flex justify-between text-xs text-slate-400 mb-1.5">
                     <span>Progress</span>
-                    <span className="text-slate-200 font-bold">{g.progress_percentage.toFixed(1)}%</span>
+                    <span className="text-slate-200 font-semibold tabular-nums">{g.progress_percentage.toFixed(1)}%</span>
                   </div>
-                  <div className="w-full h-2.5 rounded-full bg-[#1A2338] overflow-hidden">
+                  <div className="w-full h-1.5 rounded-full bg-[#272F42] overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isCompleted
                           ? 'bg-emerald-500'
-                          : 'bg-gradient-to-r from-blue-500 to-indigo-400'
+                          : 'bg-amber-500'
                       }`}
                       style={{ width: `${Math.min(g.progress_percentage, 100)}%` }}
                     ></div>
@@ -205,15 +205,15 @@ export default function GoalsPage() {
 
                 {/* Deterministic Dynamic Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1E293B] text-xs">
-                  <div className="p-2 rounded-lg bg-[#11192C]">
+                  <div className="p-2 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                     <span className="text-[10px] text-slate-400 uppercase">Required Monthly</span>
-                    <div className="font-bold text-emerald-400 mt-0.5">
+                    <div className="font-semibold text-emerald-400 mt-0.5 tabular-nums">
                       {isCompleted ? 'Target Achieved' : `${formatCurrency(reqMonthly)}/mo`}
                     </div>
                   </div>
-                  <div className="p-2 rounded-lg bg-[#11192C]">
+                  <div className="p-2 rounded-lg bg-[#0F172A] border border-[#1E293B]">
                     <span className="text-[10px] text-slate-400 uppercase">Projected Completion</span>
-                    <div className="font-bold text-white mt-0.5">
+                    <div className="font-semibold text-white mt-0.5">
                       {g.projected_completion_date || formatDate(g.target_date)}
                     </div>
                   </div>
@@ -221,8 +221,8 @@ export default function GoalsPage() {
 
                 {/* AI Contextual Recommendation */}
                 {g.ai_recommendation && (
-                  <div className="p-3 rounded-xl bg-[#11192C] border border-[#1E293B] flex items-start space-x-2 text-xs text-slate-300">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="p-2.5 rounded-lg bg-[#0F172A] border border-[#1E293B] flex items-start space-x-2 text-xs text-slate-300">
+                    <Sparkles className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
                     <p className="leading-relaxed">{g.ai_recommendation}</p>
                   </div>
                 )}
@@ -231,7 +231,7 @@ export default function GoalsPage() {
                 {!isCompleted && (
                   <button
                     onClick={() => setContributeModal({ isOpen: true, goalId: g.id, goalTitle: g.title, amount: '5000' })}
-                    className="w-full py-2 rounded-xl bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center space-x-1.5"
+                    className="w-full py-2 rounded-lg bg-[#0F172A] hover:bg-[#272F42] border border-[#1E293B] text-xs font-semibold text-slate-200 transition-colors flex items-center justify-center space-x-1.5"
                   >
                     <Plus className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Contribute Savings</span>
@@ -244,29 +244,29 @@ export default function GoalsPage() {
       </div>
 
       {/* Interactive SIP Compound Interest Calculator Card */}
-      <div className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-6">
+      <div className="p-5 sm:p-6 rounded-xl bg-[#222735] border border-[#1E293B] space-y-5">
         <div className="flex items-center justify-between border-b border-[#1E293B] pb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <Calculator className="w-5 h-5" />
+            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Calculator className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="font-bold text-white text-base">Interactive SIP Wealth Compounding Simulator</h2>
+              <h2 className="font-semibold text-white text-sm sm:text-base">Interactive SIP Wealth Compounding Simulator</h2>
               <p className="text-xs text-slate-400">Explore how systematic equity investing harnesses mathematical compound interest</p>
             </div>
           </div>
-          <span className="text-xs text-emerald-400 font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20">
-            12% Historical CAGR Model
+          <span className="text-[11px] text-emerald-400 font-medium px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+            12% CAGR Model
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
           {/* Sliders */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="lg:col-span-2 space-y-4">
             <div>
-              <div className="flex justify-between text-xs text-slate-300 font-semibold mb-2">
+              <div className="flex justify-between text-xs text-slate-300 font-medium mb-1.5">
                 <span>Monthly Investment:</span>
-                <span className="text-blue-400 font-bold">{formatCurrency(sipMonthly)}/mo</span>
+                <span className="text-amber-400 font-semibold tabular-nums">{formatCurrency(sipMonthly)}/mo</span>
               </div>
               <input
                 type="range"
@@ -275,14 +275,14 @@ export default function GoalsPage() {
                 step={1000}
                 value={sipMonthly}
                 onChange={(e) => setSipMonthly(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="w-full h-1.5 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-amber-500"
               />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs text-slate-300 font-semibold mb-2">
+              <div className="flex justify-between text-xs text-slate-300 font-medium mb-1.5">
                 <span>Expected Annual Return (ROI):</span>
-                <span className="text-emerald-400 font-bold">{sipRate}% CAGR</span>
+                <span className="text-emerald-400 font-semibold tabular-nums">{sipRate}% CAGR</span>
               </div>
               <input
                 type="range"
@@ -291,14 +291,14 @@ export default function GoalsPage() {
                 step={0.5}
                 value={sipRate}
                 onChange={(e) => setSipRate(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-1.5 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-emerald-500"
               />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs text-slate-300 font-semibold mb-2">
+              <div className="flex justify-between text-xs text-slate-300 font-medium mb-1.5">
                 <span>Investment Horizon:</span>
-                <span className="text-indigo-400 font-bold">{sipYears} Years</span>
+                <span className="text-purple-400 font-semibold tabular-nums">{sipYears} Years</span>
               </div>
               <input
                 type="range"
@@ -306,26 +306,26 @@ export default function GoalsPage() {
                 max={30}
                 value={sipYears}
                 onChange={(e) => setSipYears(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A2338] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                className="w-full h-1.5 bg-[#272F42] rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
           </div>
 
           {/* Results Box */}
-          <div className="p-5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-4">
+          <div className="p-4 rounded-xl bg-[#0F172A] border border-[#1E293B] space-y-3">
             <div>
-              <span className="text-xs text-slate-400">Total Capital Invested</span>
-              <div className="text-lg font-bold text-slate-200 mt-0.5">{formatCurrency(totalInvested)}</div>
+              <span className="text-[11px] text-slate-400">Total Capital Invested</span>
+              <div className="text-base font-bold text-slate-200 mt-0.5 tabular-nums">{formatCurrency(totalInvested)}</div>
             </div>
 
             <div>
-              <span className="text-xs text-slate-400">Estimated Wealth Gain</span>
-              <div className="text-lg font-bold text-emerald-400 mt-0.5">+{formatCurrency(wealthGain)}</div>
+              <span className="text-[11px] text-slate-400">Estimated Wealth Gain</span>
+              <div className="text-base font-bold text-emerald-400 mt-0.5 tabular-nums">+{formatCurrency(wealthGain)}</div>
             </div>
 
-            <div className="pt-3 border-t border-[#1E293B]">
-              <span className="text-xs text-slate-400">Projected Maturity Corpus</span>
-              <div className="text-2xl font-extrabold text-white mt-0.5">{formatCurrency(futureValue)}</div>
+            <div className="pt-2.5 border-t border-[#1E293B]">
+              <span className="text-[11px] text-slate-400">Projected Maturity Corpus</span>
+              <div className="text-xl font-bold text-white mt-0.5 tabular-nums">{formatCurrency(futureValue)}</div>
             </div>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function GoalsPage() {
       {/* Goal Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-base">Create Financial Goal</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
@@ -353,8 +353,8 @@ export default function GoalsPage() {
                     onClick={() => handleSelectPreset(cat)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                       goalForm.category === cat.name
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-[#11192C] text-slate-300 hover:text-white border border-[#1E293B]'
+                        ? 'bg-amber-500 text-[#0F172A]'
+                        : 'bg-[#222735] text-slate-300 hover:text-white border border-[#1E293B]'
                     }`}
                   >
                     {cat.name}
@@ -372,7 +372,7 @@ export default function GoalsPage() {
                   placeholder="e.g. MacBook Pro M-Series"
                   value={goalForm.title}
                   onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 />
               </div>
 
@@ -385,7 +385,7 @@ export default function GoalsPage() {
                     placeholder="80000"
                     value={goalForm.target_amount}
                     onChange={(e) => setGoalForm({ ...goalForm, target_amount: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                   />
                 </div>
                 <div>
@@ -395,7 +395,7 @@ export default function GoalsPage() {
                     placeholder="23000"
                     value={goalForm.current_amount}
                     onChange={(e) => setGoalForm({ ...goalForm, current_amount: e.target.value })}
-                    className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                    className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                   />
                 </div>
               </div>
@@ -406,12 +406,12 @@ export default function GoalsPage() {
                   type="date"
                   value={goalForm.target_date}
                   onChange={(e) => setGoalForm({ ...goalForm, target_date: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 />
               </div>
 
               {/* Dynamic Required Monthly Saving Preview Box */}
-              <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
                 <div className="flex justify-between text-slate-400 text-[11px]">
                   <span>Remaining Corpus:</span>
                   <strong className="text-white">{formatCurrency(formRemaining)}</strong>
@@ -428,7 +428,7 @@ export default function GoalsPage() {
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all"
+                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0F172A] font-semibold shadow-lg shadow-amber-500/25 transition-all"
               >
                 Start Tracking Goal
               </button>
@@ -440,7 +440,7 @@ export default function GoalsPage() {
       {/* Quick Contribute Modal */}
       {contributeModal.isOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D1322] border border-[#1E293B] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-base">Contribute to {contributeModal.goalTitle}</h3>
               <button onClick={() => setContributeModal({ isOpen: false, goalId: '', goalTitle: '', amount: '5000' })} className="text-slate-400 hover:text-white">
@@ -456,7 +456,7 @@ export default function GoalsPage() {
                   required
                   value={contributeModal.amount}
                   onChange={(e) => setContributeModal({ ...contributeModal, amount: e.target.value })}
-                  className="w-full p-2.5 bg-[#11192C] border border-[#1E293B] rounded-xl text-slate-200"
+                  className="w-full p-2.5 bg-[#222735] border border-[#1E293B] rounded-xl text-slate-200"
                 />
               </div>
 

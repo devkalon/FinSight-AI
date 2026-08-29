@@ -56,39 +56,39 @@ export default function MonthlyReportPage() {
   const n = report?.narrative;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E293B] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1E293B]">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <h1 className="text-2xl font-bold text-white tracking-tight">AI-Assisted Monthly Financial Statement</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold text-xs border border-emerald-500/20">
-              Deterministic + AI Narrative
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Financial Intelligence Statement</h1>
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium text-[11px] border border-emerald-500/20">
+              Verified Statement
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
             11-section executive financial intelligence statement verified against backend calculations
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 self-start sm:self-auto">
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
           {/* Month Selector */}
-          <div className="flex items-center space-x-2 bg-[#0D1322] border border-[#1E293B] px-3 py-2 rounded-xl text-xs">
+          <div className="flex items-center space-x-2 bg-[#222735] border border-[#1E293B] px-3 py-1.5 rounded-lg text-xs">
             <Calendar className="w-3.5 h-3.5 text-slate-400" />
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-slate-200 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-slate-200 font-medium focus:outline-none cursor-pointer text-xs"
             >
-              <option value="2026-08" className="bg-[#0D1322] text-white">August 2026</option>
-              <option value="2026-07" className="bg-[#0D1322] text-white">July 2026</option>
-              <option value="2026-06" className="bg-[#0D1322] text-white">June 2026</option>
+              <option value="2026-08" className="bg-[#222735] text-white">August 2026</option>
+              <option value="2026-07" className="bg-[#222735] text-white">July 2026</option>
+              <option value="2026-06" className="bg-[#222735] text-white">June 2026</option>
             </select>
           </div>
 
           <button
             onClick={handleExportPdf}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-semibold shadow-xs transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export PDF</span>
@@ -96,7 +96,7 @@ export default function MonthlyReportPage() {
 
           <button
             onClick={handlePrint}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#11192C] hover:bg-[#1E293B] border border-[#1E293B] text-slate-300 text-xs font-semibold transition-all"
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-[#222735] hover:bg-[#272F42] border border-[#1E293B] text-slate-300 text-xs font-medium transition-all"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print</span>
@@ -105,9 +105,9 @@ export default function MonthlyReportPage() {
       </div>
 
       {/* Verification Notice Banner */}
-      <div className="p-4 rounded-2xl bg-[#0D1322] border border-blue-500/20 flex items-center justify-between text-xs text-slate-300">
+      <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/20 flex items-center justify-between text-xs text-slate-300">
         <div className="flex items-center space-x-2.5">
-          <ShieldCheck className="w-4 h-4 text-blue-400 flex-shrink-0" />
+          <ShieldCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
           <span>
             <strong>Deterministic Audit Guarantee:</strong> All financial statistics and tables are computed deterministically from verified ledger databases. The AI narrative synthesizes these numbers without alteration.
           </span>
@@ -116,10 +116,10 @@ export default function MonthlyReportPage() {
       </div>
 
       {/* 1. EXECUTIVE SUMMARY */}
-      <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-5">
+      <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-5">
         <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
           <div className="flex items-center space-x-2.5">
-            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold">1</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-bold">1</span>
             <h2 className="font-bold text-white text-base">Executive Summary</h2>
           </div>
           <span className="text-xs text-slate-400">Statement Period: {m?.month_name}</span>
@@ -127,30 +127,30 @@ export default function MonthlyReportPage() {
 
         {/* 5 KPI Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
-          <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+          <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
             <span className="text-slate-400 text-[11px]">Total Income</span>
             <div className="text-lg font-bold text-emerald-400">{formatCurrency(m?.total_income || 75000)}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+          <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
             <span className="text-slate-400 text-[11px]">Total Expenses</span>
             <div className="text-lg font-bold text-white">{formatCurrency(m?.total_expenses || 34200)}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+          <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
             <span className="text-slate-400 text-[11px]">Net Savings Surplus</span>
-            <div className="text-lg font-bold text-blue-400">+{formatCurrency(m?.net_savings || 40800)}</div>
+            <div className="text-lg font-bold text-amber-400">+{formatCurrency(m?.net_savings || 40800)}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+          <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
             <span className="text-slate-400 text-[11px]">Savings Rate</span>
             <div className="text-lg font-bold text-purple-400">{m?.savings_rate_pct || 54.4}%</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-1">
+          <div className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-1">
             <span className="text-slate-400 text-[11px]">Health Score</span>
             <div className="text-lg font-bold text-amber-400">{m?.health_score || 78}/100</div>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#11192C] border border-[#1E293B] text-xs text-slate-200 leading-relaxed space-y-1">
-          <div className="flex items-center space-x-1.5 text-blue-400 font-bold mb-1">
+        <div className="p-4 rounded-xl bg-[#222735] border border-[#1E293B] text-xs text-slate-200 leading-relaxed space-y-1">
+          <div className="flex items-center space-x-1.5 text-amber-400 font-bold mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>AI Executive Narrative:</span>
           </div>
@@ -161,7 +161,7 @@ export default function MonthlyReportPage() {
       {/* 2. INCOME & 3. SPENDING */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Section 2: Income */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold">2</span>
             <h2 className="font-bold text-white text-base">Income Analysis</h2>
@@ -173,7 +173,7 @@ export default function MonthlyReportPage() {
         </section>
 
         {/* Section 3: Spending */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-rose-500/10 text-rose-400 text-xs font-bold">3</span>
             <h2 className="font-bold text-white text-base">Spending Breakdown</h2>
@@ -184,11 +184,11 @@ export default function MonthlyReportPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2.5 rounded-lg bg-[#11192C]">
+            <div className="p-2.5 rounded-lg bg-[#222735]">
               <span className="text-slate-400 text-[10px] uppercase">Essential Needs</span>
               <div className="font-bold text-white mt-0.5">{formatCurrency(m?.essential_spending || 14600)}</div>
             </div>
-            <div className="p-2.5 rounded-lg bg-[#11192C]">
+            <div className="p-2.5 rounded-lg bg-[#222735]">
               <span className="text-slate-400 text-[10px] uppercase">Discretionary Wants</span>
               <div className="font-bold text-white mt-0.5">{formatCurrency(m?.discretionary_spending || 19600)}</div>
             </div>
@@ -198,11 +198,11 @@ export default function MonthlyReportPage() {
       </div>
 
       {/* Top Categories Table */}
-      <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+      <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
         <h3 className="font-bold text-white text-sm">Category Expenditure Distribution</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-[#11192C] text-slate-400 uppercase text-[10px]">
+            <thead className="bg-[#222735] text-slate-400 uppercase text-[10px]">
               <tr>
                 <th className="p-3 rounded-l-lg">Category</th>
                 <th className="p-3">Monthly Outlay</th>
@@ -212,13 +212,13 @@ export default function MonthlyReportPage() {
             </thead>
             <tbody className="divide-y divide-[#1E293B]">
               {m?.spending_by_category.map((cat, i) => (
-                <tr key={i} className="hover:bg-[#11192C]/50">
+                <tr key={i} className="hover:bg-[#222735]/50">
                   <td className="p-3 font-semibold text-white">{cat.category_name}</td>
                   <td className="p-3 font-bold text-slate-200">{formatCurrency(cat.amount)}</td>
                   <td className="p-3 text-slate-300">{cat.percentage}%</td>
                   <td className="p-3">
-                    <div className="w-36 h-2 rounded-full bg-[#1A2338] overflow-hidden">
-                      <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.min(cat.percentage * 2, 100)}%` }}></div>
+                    <div className="w-36 h-2 rounded-full bg-[#272F42] overflow-hidden">
+                      <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(cat.percentage * 2, 100)}%` }}></div>
                     </div>
                   </td>
                 </tr>
@@ -231,13 +231,13 @@ export default function MonthlyReportPage() {
       {/* 4. SAVINGS & 5. BUDGET PERFORMANCE */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Section 4: Savings */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 text-xs font-bold">4</span>
             <h2 className="font-bold text-white text-base">Savings Performance</h2>
           </div>
           <div className="flex justify-between items-baseline">
-            <div className="text-2xl font-extrabold text-blue-400">+{formatCurrency(m?.net_savings || 40800)}</div>
+            <div className="text-2xl font-extrabold text-amber-400">+{formatCurrency(m?.net_savings || 40800)}</div>
             <span className="text-xs font-bold text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
               {m?.savings_rate_pct}% Savings Rate
             </span>
@@ -246,9 +246,9 @@ export default function MonthlyReportPage() {
         </section>
 
         {/* Section 5: Budget Performance */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
-            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold">5</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-bold">5</span>
             <h2 className="font-bold text-white text-base">Budget Adherence</h2>
           </div>
           <div className="flex justify-between items-baseline">
@@ -260,10 +260,10 @@ export default function MonthlyReportPage() {
       </div>
 
       {/* 6. GOAL PROGRESS */}
-      <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+      <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
         <div className="flex items-center justify-between border-b border-[#1E293B] pb-3">
           <div className="flex items-center space-x-2.5">
-            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs font-bold">6</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 text-xs font-bold">6</span>
             <h2 className="font-bold text-white text-base">Financial Goal Progress</h2>
           </div>
           <span className="text-xs text-slate-400">
@@ -275,13 +275,13 @@ export default function MonthlyReportPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           {m?.goals.map((g, idx) => (
-            <div key={idx} className="p-3.5 rounded-xl bg-[#11192C] border border-[#1E293B] space-y-2">
+            <div key={idx} className="p-3.5 rounded-xl bg-[#222735] border border-[#1E293B] space-y-2">
               <div className="flex justify-between font-semibold text-white">
                 <span>{g.title}</span>
-                <span className="text-indigo-400">{g.progress_percentage}%</span>
+                <span className="text-purple-400">{g.progress_percentage}%</span>
               </div>
-              <div className="w-full h-1.5 rounded-full bg-[#1A2338] overflow-hidden">
-                <div className="h-full rounded-full bg-indigo-500" style={{ width: `${Math.min(g.progress_percentage, 100)}%` }}></div>
+              <div className="w-full h-1.5 rounded-full bg-[#272F42] overflow-hidden">
+                <div className="h-full rounded-full bg-purple-500" style={{ width: `${Math.min(g.progress_percentage, 100)}%` }}></div>
               </div>
               <div className="flex justify-between text-[11px] text-slate-400">
                 <span>Target: {g.projected_completion_date}</span>
@@ -295,7 +295,7 @@ export default function MonthlyReportPage() {
       {/* 7. ANOMALIES & 8. RECURRING EXPENSES */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Section 7: Anomalies */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-bold">7</span>
             <h2 className="font-bold text-white text-base">Anomaly Detection</h2>
@@ -307,7 +307,7 @@ export default function MonthlyReportPage() {
         </section>
 
         {/* Section 8: Recurring Expenses */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-rose-500/10 text-rose-400 text-xs font-bold">8</span>
             <h2 className="font-bold text-white text-base">Recurring Expenses</h2>
@@ -320,14 +320,14 @@ export default function MonthlyReportPage() {
       </div>
 
       {/* 9. FORECAST */}
-      <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+      <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
         <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
-          <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold">9</span>
+          <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-bold">9</span>
           <h2 className="font-bold text-white text-base">Predictive Expense Forecast (Next 30 Days)</h2>
         </div>
         <div className="flex justify-between items-baseline">
           <div className="text-2xl font-extrabold text-white">{formatCurrency(m?.forecast_next_30_days || 34884)}</div>
-          <span className="text-xs text-blue-400 font-bold px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
+          <span className="text-xs text-amber-400 font-bold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
             Confidence: {Math.round((m?.forecast_confidence || 0.88) * 100)}%
           </span>
         </div>
@@ -337,7 +337,7 @@ export default function MonthlyReportPage() {
       {/* 10. KEY OBSERVATIONS & 11. RECOMMENDED ACTIONS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Section 10 */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-700 text-white text-xs font-bold">10</span>
             <h2 className="font-bold text-white text-base">Key Observations</h2>
@@ -345,7 +345,7 @@ export default function MonthlyReportPage() {
           <ul className="space-y-2.5 text-xs text-slate-200">
             {n?.key_observations.map((obs, idx) => (
               <li key={idx} className="flex items-start space-x-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span>
                 <span>{obs}</span>
               </li>
             ))}
@@ -353,7 +353,7 @@ export default function MonthlyReportPage() {
         </section>
 
         {/* Section 11 */}
-        <section className="p-6 rounded-2xl bg-[#0D1322] border border-[#1E293B] space-y-4">
+        <section className="p-6 rounded-2xl bg-[#0F172A] border border-[#1E293B] space-y-4">
           <div className="flex items-center space-x-2.5 border-b border-[#1E293B] pb-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-600 text-white text-xs font-bold">11</span>
             <h2 className="font-bold text-white text-base">Recommended Action Plan</h2>
