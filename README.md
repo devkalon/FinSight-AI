@@ -1,283 +1,345 @@
-# FinSight AI — Production-Grade Personal Finance & Wealth Management Platform
+<p align="center">
+  <img src="logo.png" alt="FinSight AI" width="420" />
+</p>
 
-**Track B Enterprise Fintech & Multi-Agent AI System**  
-*Built for the Capabl 8-Week Dual-Track Curriculum.*
+<p align="center">
+  <strong>Insights Today. Wealth Tomorrow.</strong>
+</p>
 
----
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#api-reference">API</a> •
+  <a href="#testing">Testing</a> •
+  <a href="#credits">Credits</a>
+</p>
 
-## 1. Project Overview
-FinSight AI is a production-ready personal financial intelligence platform designed to eliminate financial stress through automated multi-source ingestion, hybrid machine learning categorization, deterministic analytics engines, and a grounded AI Financial Advisor. 
-
-The application combines a high-performance Next.js 14 web application with a FastAPI ASGI backend, managed relational and vector database storage, local PII privacy protection, and a multi-agent AI framework based on top financial literature.
-
----
-
-## 2. Problem Statement
-Managing personal finances across fragmented payment systems (UPI, credit cards, bank statements, subscription billing) is tedious and prone to human error:
-- **Data Fragmentation**: Manual tracking across multiple banking apps leads to incomplete financial visibility.
-- **AI Math Hallucinations**: Standard LLM chat tools frequently hallucinate numerical figures, loan interest schedules, and investment projections.
-- **Privacy & Data Security**: Uploading raw bank statements or payment receipts to external AI services risks exposing sensitive PII (PAN numbers, bank account numbers, phone numbers).
-- **Generic Financial Advice**: Conventional advice fails to adapt to Indian tax structures (Section 80C, 80D, PPF, ELSS) or contrast differing wealth philosophies.
-
-FinSight AI resolves these challenges through local PII scrubbing, deterministic financial tools, multi-source ingestion adapters, and grounded multi-agent AI reasoning.
-
----
-
-## 3. Features
-- **Multi-Source Ingestion & OCR**: Direct parsers for HDFC Bank PDF statements, SBI CSV exports, PhonePe UPI exports, and Tesseract OCR receipt image processing with magic byte header validation.
-- **Local PII Privacy Scrubber**: Automatic redaction of PAN numbers, Aadhaar, bank account numbers, credit cards, emails, and phone numbers prior to persistence or AI context assembly.
-- **Hybrid 4-Layer Categorization Engine**: Rule registry $\to$ Keyword heuristics $\to$ Scikit-learn TF-IDF Logistic Regression ML model $\to$ User feedback learning API.
-- **Composite Financial Health Score (0–100)**: Evaluates emergency fund adequacy, savings rate, envelope budget discipline, and burn ratio across 7 visual factor bars.
-- **Time-Series Expense Forecasting**: 30/60/90-day time-series projections using Holt's exponential smoothing with non-guaranteed financial disclaimers and holdout backtesting.
-- **Anomaly & Subscription Tracking**: Automated detection of category spending surges, amount outliers ($Z > 3.0\sigma$), merchant spikes, frequency bursts, and subscription price hikes.
-- **What-If Financial Simulator**: Interactive scenario calculator assessing monthly cash flow, annual savings impact, and goal target acceleration.
-- **AI Multi-Agent Financial Advisor**: Grounded LangGraph agent with access to authorized financial math tools (SIP, EMI, emergency fund calculators).
-- **RAG Literature Engine**: Page-aware PDF retrieval system grounded in *The Psychology of Money*, *Rich Dad Poor Dad*, *I Will Teach You to Be Rich*, and Indian Tax Playbooks.
-- **Multi-Guru Personas**: Side-by-side advice comparison across Warren Buffett, Robert Kiyosaki, Ramit Sethi, and Indian Wealth Advisor personas.
-- **Report Exports**: Downloadable monthly financial statements in CSV and PDF formats.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=next.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/LangGraph-AI_Agent-FF6F00?style=for-the-badge&logo=chainlink&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+</p>
 
 ---
 
-## 4. Architecture
+## What is FinSight AI?
 
-```mermaid
-graph TD
-    Client[Next.js 14 Web Interface] -->|REST API / HTTPS| Gateway[FastAPI ASGI Gateway]
-    
-    subgraph "Core Backend Gateway & Security"
-        Gateway --> Auth[JWT Authentication & Security Headers]
-        Gateway --> RateLimit[Token Bucket Rate Limiter]
-        Gateway --> PIIScrubber[Local PII Scrubber]
-    end
+**FinSight AI** is a full-stack, AI-powered personal finance and wealth management platform built for the Indian financial ecosystem. It combines intelligent document ingestion, ML-driven analytics, and an agentic AI advisor to give users complete visibility and control over their financial life.
 
-    subgraph "Deterministic Engines & Analytics"
-        Gateway --> FinEngine[Financial Analytics Engine]
-        Gateway --> HealthEngine[Composite Health Score Engine]
-        Gateway --> SimEngine[What-If Simulator Engine]
-    end
+Upload a bank statement PDF, a UPI receipt screenshot, or a CSV export — FinSight automatically extracts transactions, categorizes spending, detects anomalies, tracks subscriptions, and delivers actionable insights through an interactive AI advisor that speaks the language of legendary financial thinkers.
 
-    subgraph "Ingestion & ML Layer"
-        Gateway --> DocService[Document Service & OCR]
-        Gateway --> MLClassifier[Hybrid 4-Layer Categorizer]
-        Gateway --> Forecaster[Time-Series Forecaster]
-        Gateway --> AnomalyDetector[Anomaly & Subscription Detector]
-    end
+---
 
-    subgraph "AI Advisor & RAG System"
-        Gateway --> Agent[LangGraph Financial Advisor Agent]
-        Agent --> FinTools[Deterministic Math Tools]
-        Agent --> GuruEngine[Multi-Guru Engine]
-        Agent --> RAG[Page-Aware RAG Engine]
-    end
+## Features
 
-    subgraph "Persistence Tier"
-        FinEngine --> DB[(PostgreSQL + pgvector / SQLite)]
-        DocService --> DB
-        MLClassifier --> DB
-        RAG --> DB
-    end
+### 📄 Intelligent Document Ingestion
+- **Multi-format support** — PDF bank statements, receipt images (OCR), and CSV exports
+- **Indian bank adapters** — Pre-built parsers for HDFC, ICICI, SBI, and UPI transaction formats
+- **OCR pipeline** — Tesseract + Pillow preprocessing with EXIF correction, DPI scaling, and adaptive thresholding
+- **Indian financial normalization** — ₹ currency parsing, lakh/crore notation, UPI reference extraction
+
+### 🤖 Agentic AI Financial Advisor
+- **LangGraph-powered ReAct agent** — Tool-calling architecture with structured financial reasoning
+- **RAG knowledge engine** — Retrieval-augmented generation grounded in the user's own financial data
+- **Multi-philosophy comparison** — Compare advice from Warren Buffett (value compounding), Robert Kiyosaki (cashflow assets), and Ramit Sethi (conscious spending)
+- **Financial guru personas** — Each guru has a distinct personality, vocabulary, and investment philosophy
+- **Red team evaluation** — Automated adversarial testing for AI safety and grounding validation
+
+### 📊 ML Analytics Engine
+- **Smart categorization** — Rule-based + ML hybrid categorizer with merchant learning and 50/30/20 budget classification
+- **Expense forecasting** — Time-series prediction using linear regression with seasonal adjustments
+- **Anomaly detection** — Six-strategy detector (statistical outliers, frequency anomalies, merchant spikes, round-number detection, weekend/holiday patterns, category drift)
+- **Subscription tracker** — Automatic recurring payment detection with billing cycle inference
+
+### 💰 Financial Health & Planning
+- **Financial Health Score** — Composite 0–100 score across savings rate, debt-to-income, emergency fund, expense stability, and investment diversity
+- **Budget management** — Category-level budgets with real-time tracking, alerts, and rollover support
+- **Financial goals** — Goal creation with milestone tracking, contribution logging, and progress visualization
+- **What-If simulator** — Scenario modeling for salary changes, new expenses, investment returns, and debt payoff
+
+### 📈 Reports & Visualization
+- **Interactive dashboard** — Real-time spending charts, income vs. expense trends, and category breakdowns (Recharts)
+- **Monthly financial reports** — Auto-generated PDF reports with charts, insights, and recommendations (ReportLab)
+- **Trend analytics** — Month-over-month comparisons, top merchants, spending velocity analysis
+
+### 🔒 Security & Privacy
+- **JWT authentication** — Secure token-based auth with bcrypt password hashing
+- **Google OAuth 2.0** — One-click sign-in with automatic profile provisioning
+- **Token revocation** — Thread-safe in-memory revocation store with logout support
+- **GDPR account deletion** — Full data purge including uploaded documents and audit trails
+- **Audit logging** — Every sensitive operation is recorded with user ID, action type, and timestamp
+- **Input validation** — Pydantic v2 schemas for strict request/response validation throughout
+
+---
+
+## Tech Stack
+
+### Backend
+| Technology | Purpose |
+|---|---|
+| **FastAPI** | Async Python API framework |
+| **SQLAlchemy 2.0** | Async ORM with full relationship mapping |
+| **PostgreSQL 16 + pgvector** | Relational data store with vector embedding support |
+| **Alembic** | Database migrations |
+| **LangGraph + LangChain** | Agentic AI orchestration and tool-calling |
+| **scikit-learn** | ML models for categorization, forecasting, anomaly detection |
+| **Pillow + Tesseract** | Image preprocessing and OCR |
+| **pypdf + pdfplumber** | PDF text extraction |
+| **ReportLab** | PDF report generation |
+| **pandas + NumPy** | Data wrangling and numerical computation |
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **Next.js 14** | React framework with App Router |
+| **TypeScript** | Type-safe frontend development |
+| **Tailwind CSS** | Utility-first styling |
+| **Recharts** | Interactive financial charts and visualizations |
+| **Lucide React** | Icon system |
+
+### Infrastructure
+| Technology | Purpose |
+|---|---|
+| **Docker Compose** | Multi-container orchestration (PostgreSQL + Backend + Frontend) |
+| **pgvector** | Vector similarity search for RAG embeddings |
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (Next.js 14)                    │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────────┐  │
+│  │Dashboard │ │Analytics │ │ Upload   │ │ AI Advisor Chat   │  │
+│  │Budgets   │ │Forecast  │ │ Documents│ │ Philosophy Compare│  │
+│  │Goals     │ │Anomalies │ │ Receipts │ │ Guru Personas     │  │
+│  │Settings  │ │Simulator │ │ CSV/PDF  │ │ RAG Knowledge     │  │
+│  └──────────┘ └──────────┘ └──────────┘ └───────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ REST API (fetch)
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     BACKEND (FastAPI)                            │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                   API Layer (v1)                          │   │
+│  │  /auth  /transactions  /documents  /analytics  /advisor  │   │
+│  │  /budgets  /goals  /subscriptions  /reports              │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         ▼                                       │
+│  ┌─────────────┐ ┌─────────────┐ ┌──────────────────────────┐  │
+│  │ Services    │ │ ML Engine   │ │ AI Engine                │  │
+│  │ Auth        │ │ Categorizer │ │ LangGraph Agent          │  │
+│  │ Ingestion   │ │ Forecaster  │ │ RAG Engine               │  │
+│  │ Analytics   │ │ Anomaly Det.│ │ Guru Personas            │  │
+│  │ Reports     │ │ Sub Tracker │ │ Red Team / Eval          │  │
+│  └─────────────┘ └─────────────┘ └──────────────────────────┘  │
+│                         ▼                                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │           Data Layer (SQLAlchemy + Repositories)         │   │
+│  │  Users · Transactions · Categories · Documents · Budgets │   │
+│  │  Goals · Subscriptions · Anomalies · Chat · Audit Logs   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │  PostgreSQL 16      │
+                  │  + pgvector         │
+                  └─────────────────────┘
 ```
 
 ---
 
-## 5. Technology Stack
-- **Frontend**: Next.js 14 (App Router), TypeScript, Vanilla CSS design system, Tailwind CSS, Recharts, Lucide Icons.
-- **Backend**: Python 3.11, FastAPI, Uvicorn, SQLAlchemy 2.0 Async ORM, Pydantic v2.
-- **Database**: Managed PostgreSQL 16 with `pgvector` extension (production) / SQLite with `aiosqlite` (local standalone).
-- **Machine Learning & Analytics**: Scikit-Learn (TF-IDF, Logistic Regression), NumPy, SciPy, Pandas.
-- **OCR & Document Parsing**: Tesseract OCR, OpenCV / PIL image preprocessors, PyPDF2, PDFPlumber.
-- **AI Framework & RAG**: LangChain / LangGraph, Sentence-Transformers, PyPDF.
-- **PDF Generation**: ReportLab PDF Engine.
-- **Testing & Quality**: Pytest, Pytest-Asyncio, HTTPX.
-- **Containerization & Infra**: Docker, Docker Compose, Nginx reverse proxy.
+## Getting Started
 
----
+### Prerequisites
 
-## 6. Folder Structure
+- **Python** 3.11+
+- **Node.js** 18+
+- **Docker & Docker Compose** (for PostgreSQL)
+- **Git**
 
-```
-Capabl/
-├── backend/
-│   ├── app/
-│   │   ├── api/v1/endpoints/    # REST API Controllers (Auth, Transactions, Analytics, etc.)
-│   │   ├── core/                # Config, Database, Security, Rate Limiter, PII Scrubber
-│   │   ├── models/              # SQLAlchemy Database Models (User, Transaction, Budget, Goal, etc.)
-│   │   ├── schemas/             # Pydantic Input/Output Validation Schemas
-│   │   ├── services/            # Business Logic (Analytics, Health Score, Simulator, AI, ML)
-│   │   │   ├── ai/              # Advisor Agent, Tools, RAG Engine, Multi-Guru Engine
-│   │   │   ├── ingestion/       # Bank Adapters (HDFC, SBI, PhonePe), OCR, CSV Parser
-│   │   │   └── ml/              # 4-Layer Categorizer, Anomaly Detector, Forecaster
-│   │   └── main.py              # FastAPI Application Entry Point & Middleware
-│   ├── Dockerfile
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── app/                 # 19 Next.js App Router Pages (/dashboard, /transactions, etc.)
-│   │   ├── components/          # Reusable UI Components (Sidebar, Charts, Header, Modals)
-│   │   └── lib/                 # API Client & Custom Utilities
-│   ├── Dockerfile
-│   └── package.json
-├── docs/                        # Complete Engineering & Architecture Documentation
-│   ├── architecture.md
-│   ├── database.md
-│   ├── api.md
-│   ├── ai-system.md
-│   ├── rag.md
-│   ├── ml.md
-│   ├── security.md
-│   ├── evaluation.md
-│   └── deployment.md
-├── tests/                       # Complete Pytest Integration Suite (106 Tests)
-├── docker-compose.yml
-├── .env.example
-└── README.md
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/devkalon/FinSight-AI.git
+cd FinSight-AI
 ```
 
----
+### 2. Start the Database
 
-## 7. Database Architecture
-
-Detailed ERD and schema specification available in [`docs/database.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/database.md).
-
-```mermaid
-erDiagram
-    USERS ||--o{ TRANSACTIONS : owns
-    USERS ||--o{ BUDGETS : limits
-    USERS ||--o{ GOALS : tracks
-    USERS ||--o{ SUBSCRIPTIONS : pays
-    CATEGORIES ||--o{ TRANSACTIONS : classifies
-    DOCUMENTS ||--o{ TRANSACTIONS : originates
+```bash
+docker compose up -d db
 ```
 
----
+This launches a PostgreSQL 16 container with pgvector on port `5432`.
 
-## 8. API Architecture
-Detailed endpoint definitions and schemas available in [`docs/api.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/api.md).
-
-Interactive OpenAPI v3 documentation available at `http://localhost:8000/docs`.
-
----
-
-## 9. AI Architecture
-Detailed agent guardrails and persona definitions available in [`docs/ai-system.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/ai-system.md).
-
----
-
-## 10. OCR Pipeline
-1. **Magic Bytes Validation**: Rejects files not matching `%PDF`, `\x89PNG`, `\xff\xd8\xff`, `WEBP`, `BM` signatures.
-2. **Preprocessing**: Grayscale conversion, adaptive thresholding, and contrast adjustment.
-3. **Tesseract Layout Extraction**: Extracts text blocks, total amount candidates, transaction dates, and merchant text.
-4. **Candidate Confirmation**: Presents candidate JSON to user for single-click verification before ledger commit.
-
----
-
-## 11. ML Pipeline
-Detailed ML model architecture available in [`docs/ml.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/ml.md).
-
-Features 4-Layer Hybrid Categorization, Z-score anomaly detection, and Holt's exponential smoothing expense forecasting.
-
----
-
-## 12. RAG Architecture
-Detailed retrieval mechanics available in [`docs/rag.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/rag.md).
-
-Indexes *The Psychology of Money*, *Rich Dad Poor Dad*, *I Will Teach You to Be Rich*, and Indian Tax Playbooks with 500-token page-aware chunking.
-
----
-
-## 13. Security Architecture
-Detailed security audit matrix available in [`docs/security.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/security.md).
-
-Features local PII scrubbing, JWT token revocation locks, rate limiting, and security response headers.
-
----
-
-## 14. Setup Instructions
-
-### Prerequisites:
-- Python 3.11+
-- Node.js 20+
-- Tesseract OCR (`apt install tesseract-ocr` or Windows installer)
-- Docker & Docker Compose (optional for containerized deployment)
-
----
-
-## 15. Environment Variables
-Copy `.env.example` to `.env` and configure keys:
+### 3. Configure Environment Variables
 
 ```bash
 cp .env.example .env
 ```
 
+Edit `.env` with your credentials:
+
 ```env
-ENVIRONMENT="development"
-SECRET_KEY="generate-a-secure-random-secret-key-for-jwt-signing"
-DATABASE_URL="sqlite+aiosqlite:///./finsight.db"
+DATABASE_URL=postgresql+asyncpg://finsight_user:finsight_secure_pass_2026@localhost:5432/finsight_db
+SECRET_KEY=your-secure-random-key-here
+
+# Optional — Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback/google
+
+# Optional — LLM API Keys (for AI Advisor)
+GEMINI_API_KEY=your-gemini-key
+OPENAI_API_KEY=your-openai-key
 ```
 
----
+### 4. Install & Run the Backend
 
-## 16. Running Locally
-
-### 1. Backend Server:
 ```bash
+pip install -r requirements.txt
 python -m uvicorn backend.app.main:app --reload --port 8000
 ```
 
-### 2. Frontend Application:
+The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
+
+### 5. Install & Run the Frontend
+
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
-Open `http://localhost:3000` in your web browser.
+
+The app will be available at `http://localhost:3000`.
+
+### Docker Compose (Full Stack)
+
+To run everything in containers:
+
+```bash
+docker compose up --build
+```
+
+This starts PostgreSQL, the FastAPI backend, and the Next.js frontend — all wired together automatically.
 
 ---
 
-## 17. Testing
-Run the complete automated pytest suite (106 tests):
+## API Reference
+
+All endpoints are prefixed with `/api/v1`.
+
+| Module | Endpoints | Description |
+|---|---|---|
+| **Auth** | `POST /auth/register`, `POST /auth/login`, `POST /auth/google`, `POST /auth/logout`, `GET /auth/me` | User registration, login, Google OAuth, profile |
+| **Transactions** | `GET /transactions/`, `POST /transactions/`, `PUT /transactions/{id}`, `DELETE /transactions/{id}` | CRUD operations on financial transactions |
+| **Documents** | `POST /documents/upload/receipt`, `POST /documents/upload/bank-statement`, `POST /documents/{id}/confirm` | Document upload, OCR processing, transaction extraction |
+| **Analytics** | `GET /analytics/dashboard`, `GET /analytics/forecast`, `GET /analytics/anomalies`, `POST /analytics/simulation` | Dashboard data, forecasting, anomaly detection, what-if simulation |
+| **Health Score** | `GET /analytics/health-score`, `GET /analytics/health-score/history` | Financial health scoring with historical tracking |
+| **Budgets** | `GET /budgets/`, `POST /budgets/`, `DELETE /budgets/{id}` | Budget creation and tracking |
+| **Goals** | `GET /goals/`, `POST /goals/`, `POST /goals/{id}/contribute`, `DELETE /goals/{id}` | Financial goal management with contributions |
+| **Subscriptions** | `GET /subscriptions/`, `POST /subscriptions/scan`, `POST /subscriptions/{id}/confirm` | Recurring payment detection and management |
+| **Advisor** | `POST /advisor/chat`, `POST /advisor/compare` | AI financial advisor chat and philosophy comparison |
+| **Reports** | `GET /reports/export/pdf` | Monthly financial report generation (PDF) |
+
+Full interactive API documentation is available at `/docs` (Swagger UI) when the backend is running.
+
+---
+
+## Testing
+
+The project includes **27 test modules** with comprehensive coverage across all layers:
 
 ```bash
-python -m pytest tests backend/tests -v
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run a specific test module
+pytest tests/test_financial_advisor_agent.py -v
+```
+
+### Test Coverage
+
+| Area | Test File | What It Tests |
+|---|---|---|
+| Auth & Security | `test_security_and_auth.py` | JWT, password hashing, OAuth, token revocation |
+| Database Models | `test_database_models.py` | All 14 SQLAlchemy models and relationships |
+| Transactions | `test_transactions.py` | CRUD, filtering, category assignment |
+| Document Ingestion | `test_document_ingestion.py` | PDF parsing, OCR, CSV import |
+| Indian Formats | `test_indian_financial_ingestion.py` | ₹ parsing, UPI, HDFC/ICICI/SBI adapters |
+| Categorization | `test_expense_categorization_engine.py` | ML categorizer, merchant learning |
+| Forecasting | `test_expense_forecasting.py` | Time-series prediction, seasonal adjustments |
+| Anomaly Detection | `test_financial_anomaly_detector.py` | Six detection strategies |
+| Health Score | `test_financial_health_score.py` | Composite scoring, sub-scores |
+| AI Advisor | `test_financial_advisor_agent.py` | Agent tools, reasoning, persona responses |
+| RAG Engine | `test_financial_knowledge_rag.py` | Document retrieval, embedding, context building |
+| Budgets & Goals | `test_budgets_and_goals.py` | Budget tracking, goal contributions |
+| Subscriptions | `test_recurring_subscriptions.py` | Recurring payment detection |
+| What-If Simulator | `test_whatif_simulator.py` | Scenario modeling |
+| Reports | `test_monthly_financial_report.py` | PDF generation, chart data |
+| AI Safety | `test_ai_grounding_and_safety.py` | Hallucination detection, grounding validation |
+| E2E Workflow | `test_e2e_complete_workflow.py` | Full user journey from signup to insights |
+| Performance | `test_performance_benchmark.py` | Response time benchmarks |
+
+---
+
+## Project Structure
+
+```
+FinSight-AI/
+├── backend/
+│   ├── app/
+│   │   ├── api/v1/endpoints/     # FastAPI route handlers
+│   │   ├── core/                 # Config, database, security
+│   │   ├── models/               # SQLAlchemy ORM models (14 models)
+│   │   ├── repositories/         # Data access layer
+│   │   ├── schemas/              # Pydantic request/response schemas
+│   │   ├── services/
+│   │   │   ├── ai/               # LangGraph agent, RAG, guru personas
+│   │   │   ├── ml/               # Categorizer, forecaster, anomaly detector
+│   │   │   └── ingestion/        # PDF, OCR, CSV parsers + bank adapters
+│   │   └── main.py               # FastAPI application entry point
+│   ├── alembic/                  # Database migrations
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── app/                  # Next.js App Router pages (14 pages)
+│   │   ├── components/           # Shared UI components
+│   │   ├── context/              # React context (Auth)
+│   │   └── lib/                  # API client, utilities
+│   └── Dockerfile
+├── tests/                        # 27 test modules
+├── docker-compose.yml            # Full-stack orchestration
+├── requirements.txt              # Python dependencies
+└── .env.example                  # Environment variable template
 ```
 
 ---
 
-## 18. Deployment
-Detailed production deployment guide available in [`docs/deployment.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/deployment.md).
+## License
 
-```bash
-docker-compose up -d --build
-```
+This project is for educational and personal use.
 
 ---
 
-## 19. Performance Benchmarks
-Detailed benchmark scale report available in [`docs/PERFORMANCE_BENCHMARK_REPORT.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/PERFORMANCE_BENCHMARK_REPORT.md).
+## Credits
 
-Query latencies remain **< 35 ms** and dashboard calculations remain **< 85 ms** at **100,000 synthetic transactions**.
-
----
-
-## 20. AI Evaluation
-Detailed AI benchmark methodology available in [`docs/evaluation.md`](file:///c:/Users/devKalon/Desktop/Capabl/docs/evaluation.md).
-
-Achieves **100% financial calculation correctness** and **100% safety compliance** across synthetic scenario evaluations.
+Built by **Kartik** ([@devkalon](https://github.com/devkalon))
 
 ---
 
-## 21. Limitations
-- OCR accuracy depends on upload image quality and resolution.
-- RAG semantic retrieval is limited to indexed personal finance literature documents.
-- Bank statement parsers currently cover HDFC, SBI, and PhonePe formats; uncatalogued formats fallback to CSV generic mapping.
-
----
-
-## 22. Future Improvements
-- Multi-currency automatic conversion API integration.
-- Direct Account Aggregator (AA) API integration for automated real-time bank feeds.
-- Mobile application (React Native / iOS & Android).
-
----
-
-## 23. Financial Disclaimer
-FinSight AI provides financial analytics, educational insights, and statistical projections for informational purposes only. It does not constitute professional tax, legal, or investment advice. Projections are non-guaranteed estimates. Users should consult licensed financial advisors for investment decisions.
+<p align="center">
+  <img src="logo.png" alt="FinSight AI" width="200" />
+  <br />
+  <sub>Insights Today. Wealth Tomorrow.</sub>
+</p>
