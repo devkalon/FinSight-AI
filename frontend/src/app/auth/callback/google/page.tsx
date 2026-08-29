@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { API_BASE } from '@/lib/api';
 
-export default function GoogleCallbackPage() {
+function GoogleCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { applyToken } = useAuth();
@@ -61,7 +61,7 @@ export default function GoogleCallbackPage() {
     }
 
     exchangeToken();
-  }, [searchParams, router]);
+  }, [searchParams, router, applyToken]);
 
   return (
     <div className="min-h-screen bg-[#0F172A] flex flex-col items-center justify-center p-4 text-slate-100">
@@ -95,5 +95,19 @@ export default function GoogleCallbackPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0F172A] flex flex-col items-center justify-center p-4 text-slate-100">
+          <div className="w-8 h-8 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mx-auto" />
+        </div>
+      }
+    >
+      <GoogleCallbackContent />
+    </Suspense>
   );
 }
