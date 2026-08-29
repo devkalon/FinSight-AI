@@ -5,13 +5,18 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 from backend.app.core.config import settings
 
+# Auto-correct driver: Neon/Render provide postgresql:// but asyncpg needs postgresql+asyncpg://
+_db_url = settings.DATABASE_URL
+if _db_url.startswith("postgresql://"):
+    _db_url = _db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 # Engine configuration
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _db_url,
     echo=False,
     future=True,
-    poolclass=NullPool if "postgresql" in settings.DATABASE_URL else None,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+    poolclass=NullPool if "postgresql" in _db_url else None,
+    connect_args={"check_same_thread": False} if "sqlite" in _db_url else {}
 )
 
 AsyncSessionLocal = async_sessionmaker(
