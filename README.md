@@ -327,7 +327,7 @@ FinSight-AI/
 ---
 
 ## License
-
+MIT
 This project is for educational and personal use.
 
 ---
