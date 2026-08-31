@@ -335,6 +335,7 @@ This project is for educational and personal use.
 ## Credits
 
 Built by **Kartik** ([@devkalon](https://github.com/devkalon))
+Built by **Kalavathi** ([@MadeByKala](https://github.com/MadebyKala))
 
 ---
 
